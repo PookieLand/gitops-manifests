@@ -1,0 +1,10 @@
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    path: "base/services"
+    repoURL: "https://github.com/pookieland/gitops-manifests.git"
+    targetRevision: "main"
+metadata:
+  namespace: argocd
+

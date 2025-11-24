@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+  namespace: hrms
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS hrms_employees_db;
+    CREATE DATABASE IF NOT EXISTS hrms_leaves_db;
+    CREATE DATABASE IF NOT EXISTS hrms_attendance_db;
+    CREATE DATABASE IF NOT EXISTS hrms_notifications_db;
+    CREATE DATABASE IF NOT EXISTS audit_service_db;
+    CREATE DATABASE IF NOT EXISTS hrms_compliance_db;
+    CREATE DATABASE IF NOT EXISTS hrms_users_db;

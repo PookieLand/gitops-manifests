@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attendance-service
+  namespace: hrms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: attendance-service
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: attendance-service
+        tier: backend
+    spec:
+      imagePullSecrets:
+        - name: ecr-registry-secret
+      containers:
+      - name: attendance-service
+        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_NAME
+          value: "Attendance Management Service"
+        - name: DB_HOST
+          value: "mysql"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_NAME
+          value: "hrms_attendance_db"
+        - name: DB_USER
+          value: "hrms_user"
+        - name: DB_PASSWORD
+          value: "hrms_password"
+        - name: EMPLOYEE_SERVICE_URL
+          value: "http://employee-service:80/api/v1"
+        - name: LEAVE_SERVICE_URL
+          value: "http://leave-service:80/api/v1"
+        - name: AUDIT_SERVICE_URL
+          value: "http://audit-service:80/api/v1"
+        - name: NOTIFICATION_SERVICE_URL
+          value: "http://notification-service:80/api/v1"
+        - name: COMPLIANCE_SERVICE_URL
+          value: "http://compliance-service:80/api/v1"
+        - name: JWKS_URL
+          value: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: attendance-service
+  namespace: hrms
+spec:
+  selector:
+    app: attendance-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30003
+  type: NodePort
