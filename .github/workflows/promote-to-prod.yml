@@ -62,9 +62,10 @@ jobs:
           branch: promote-$SERVICE_NAME
 
       # Step 6: Notify Slack
+            # Step 6: Notify Slack
       - name: Send Slack Notification
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          text: "PR created to promote $SERVICE_NAME image to production: $IMAGE_TAG"
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-message: "PR created to promote $SERVICE_NAME image to production: $IMAGE_TAG"
