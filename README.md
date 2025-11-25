@@ -1,1 +1,46 @@
 # gitops-manifests
+
+# Repository: `gitops-manifests`
+
+- `README.md`
+- `argo/`
+  - `Chart.yaml`
+  - `values.yaml`
+  - `templates/`
+    - `app-attendance.yaml`
+    - `app-audit.yaml`
+    - `app-compliance.yaml`
+    - `app-employee.yaml`
+    - `app-frontend.yaml`
+    - `app-leave.yaml`
+    - `app-mysql.yaml`
+    - `app-notification.yaml`
+    - `app-user.yaml`
+    - `hrms-project.yaml`
+    - `hrms-root-app.yaml`
+- `base/`
+  - `ingress.yaml`
+  - `namespace.yaml`
+  - `frontend/`
+    - `deployment.yaml`
+    - `service.yaml`
+  - `mysql/`
+    - `configmap.yaml`
+    - `pvc.yaml`
+    - `service.yaml`
+    - `statefulset.yaml`
+- `services/`
+  - `attendance-service/`
+    - `attendance-service.yaml`
+  - `audit-service/`
+    - `audit-service.yaml`
+  - `compliance-service/`
+    - `compliance-service.yaml`
+  - `employee-service/`
+    - `employee-service.yaml`
+  - `leave-service/`
+    - `leave-service.yaml`
+  - `notification-service/`
+    - `notification-service.yaml`
+  - `user-service/`
+    - `user-service.yaml`
