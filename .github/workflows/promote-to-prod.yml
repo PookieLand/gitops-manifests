@@ -1,0 +1,69 @@
+name: Promote Staging to Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'base/services/**/staging.yaml'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set changed files
+      - name: Detect changed staging.yaml
+        id: files
+        run: |
+          FILE_PATH=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep staging.yaml || true)
+          echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
+          if [ -z "$FILE_PATH" ]; then
+            echo "No staging.yaml change detected, skipping."
+            exit 0
+          fi
+          SERVICE_NAME=$(basename $(dirname $FILE_PATH))
+          echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
+          IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' $FILE_PATH)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # Step 3: Configure Git for bot commits
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitOps Bot"
+          git config --global user.email "gitops@example.com"
+
+      # Step 4: Update prod.yaml
+      - name: Update prod.yaml
+        run: |
+          PROD_FILE="base/services/$SERVICE_NAME/prod.yaml"
+          if [ ! -f "$PROD_FILE" ]; then
+            echo "$PROD_FILE does not exist, skipping."
+            exit 0
+          fi
+          yq eval -i ".spec.template.spec.containers[0].image |= \"$IMAGE_TAG\"" "$PROD_FILE"
+          git checkout -b promote-$SERVICE_NAME
+          git add "$PROD_FILE"
+          git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG"
+          git push origin promote-$SERVICE_NAME
+
+      # Step 5: Create PR for production
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Promote $SERVICE_NAME to Production"
+          body: "Automated PR: promote $SERVICE_NAME image to production: $IMAGE_TAG"
+          base: main
+          branch: promote-$SERVICE_NAME
+
+      # Step 6: Notify Slack
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          text: "PR created to promote $SERVICE_NAME image to production: $IMAGE_TAG"
