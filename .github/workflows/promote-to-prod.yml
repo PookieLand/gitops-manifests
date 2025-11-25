@@ -32,7 +32,12 @@ jobs:
         run: |
           set -euo pipefail
           # Ensure we have sufficient git history for comparing commits
-          git fetch --no-tags --prune --unshallow || true
+          # Only unshallow if this is a shallow clone
+          if [ -f .git/shallow ]; then
+            git fetch --no-tags --prune --unshallow || true
+          else
+            git fetch --no-tags --prune || true
+          fi
 
           if git rev-parse --verify ${{ github.event.before }} >/dev/null 2>&1; then
             DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
@@ -49,12 +54,25 @@ jobs:
 
           SERVICE_NAME=$(basename $(dirname $(dirname "$FILE_PATH")))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
-          IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' "$FILE_PATH")
+
+          # Read image and sanitize to a single line (remove YAML markers/newlines)
+          IMAGE_TAG_RAW=$(yq e '.spec.template.spec.containers[0].image // ""' "$FILE_PATH")
+          IMAGE_TAG=$(echo "$IMAGE_TAG_RAW" | tr -d '\r' | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          # Export outputs for later steps
-          echo "service=$SERVICE_NAME" >> $GITHUB_OUTPUT
-          echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
-          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+          # Export outputs for later steps using multiline-safe syntax
+          echo "service<<EOF" >> $GITHUB_OUTPUT
+          echo "$SERVICE_NAME" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "file<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILE_PATH" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "image<<EOF" >> $GITHUB_OUTPUT
+          echo "$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
           echo "Detected service: $SERVICE_NAME with image: $IMAGE_TAG"
 
       # Step 3: Configure Git for bot commits
