@@ -97,10 +97,9 @@ jobs:
           fi
           echo "Updating $PROD_FILE with image $IMAGE_TAG"
           yq eval -i ".spec.template.spec.containers[0].image |= \"$IMAGE_TAG\"" "$PROD_FILE"
-          git checkout -b promote-$SERVICE_NAME
+          # Commit the change locally. Do not push — the create-pull-request action will create the branch and push.
           git add "$PROD_FILE"
-          git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG"
-          git push origin promote-$SERVICE_NAME
+          git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
 
       # Step 5: Create Pull Request
       - name: Create Pull Request
