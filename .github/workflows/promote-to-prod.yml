@@ -37,7 +37,6 @@ jobs:
         run: |
           set -euo pipefail
           # Ensure we have sufficient git history for comparing commits
-          # Only unshallow if this is a shallow clone
           if [ -f .git/shallow ]; then
             git fetch --no-tags --prune --unshallow || true
           else
@@ -60,12 +59,12 @@ jobs:
           SERVICE_NAME=$(basename $(dirname $(dirname "$FILE_PATH")))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
 
-          # Read image and sanitize to a single line (remove YAML markers/newlines)
+          # Read image and sanitize
           IMAGE_TAG_RAW=$(yq e '.spec.template.spec.containers[0].image // ""' "$FILE_PATH")
           IMAGE_TAG=$(echo "$IMAGE_TAG_RAW" | tr -d '\r' | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-          # Export outputs for later steps using multiline-safe syntax
+          # Export outputs
           echo "service<<EOF" >> $GITHUB_OUTPUT
           echo "$SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -96,8 +95,11 @@ jobs:
             exit 0
           fi
           echo "Updating $PROD_FILE with image $IMAGE_TAG"
-          yq eval -i ".spec.template.spec.containers[0].image |= \"$IMAGE_TAG\"" "$PROD_FILE"
-          # Commit the change locally. Do not push — the create-pull-request action will create the branch and push.
+
+          # Update only the Deployment document
+          yq eval -i 'select(documentIndex == 0) | .spec.template.spec.containers[0].image = strenv(IMAGE_TAG)' "$PROD_FILE"
+
+          # Commit locally
           git add "$PROD_FILE"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
 
