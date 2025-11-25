@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: hrms-staging
+  namespace: argocd
+spec:
+  description: Project for all HRMS staging applications
+  sourceRepos:
+    - '*'  # allow any repo 
+  destinations:
+    - namespace: '*'   # allow apps to deploy to any namespace
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+    - group: ''
+      kind: NetworkPolicy
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
