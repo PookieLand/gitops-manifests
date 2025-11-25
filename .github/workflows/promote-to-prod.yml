@@ -11,7 +11,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -19,7 +19,7 @@ jobs:
       - name: Detect changed staging.yaml
         id: files
         run: |
-          FILE_PATH=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep 'base/services/.*/staging/staging.yaml' || true)
+          FILE_PATH=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep 'staging/staging.yaml' || true)
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
           if [ -z "$FILE_PATH" ]; then
             echo "No staging.yaml change detected, skipping."
@@ -29,7 +29,6 @@ jobs:
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
           IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' $FILE_PATH)
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "Detected service: $SERVICE_NAME with image: $IMAGE_TAG"
 
       # Step 3: Configure Git for bot commits
       - name: Configure Git
@@ -62,9 +61,9 @@ jobs:
           base: main
           branch: promote-$SERVICE_NAME
 
-      # Step 6: Send Slack Notification
+      # Step 6: Notify Slack
       - name: Send Slack Notification
-        uses: slackapi/slack-github-action@v1.30.0
+        uses: slackapi/slack-github-action@v2.1.1
         with:
           channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
           slack-message: "PR created to promote *$SERVICE_NAME* image to production: `$IMAGE_TAG`"
