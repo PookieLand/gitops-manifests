@@ -17,21 +17,44 @@ jobs:
       # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+        shell: bash
 
       # Step 2: Detect changed staging.yaml
       - name: Detect changed staging.yaml
         id: detect
         run: |
-          FILE_PATH=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'staging/staging.yaml' || true)
+          set -euo pipefail
+          # Ensure we have sufficient git history for comparing commits
+          git fetch --no-tags --prune --unshallow || true
+
+          if git rev-parse --verify ${{ github.event.before }} >/dev/null 2>&1; then
+            DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          else
+            DIFF=$(git show --name-only --pretty="" ${{ github.sha }})
+          fi
+
+          FILE_PATH=$(echo "$DIFF" | grep -E 'staging/staging.yaml$' || true)
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
           if [ -z "$FILE_PATH" ]; then
             echo "No staging.yaml change detected, skipping."
             exit 0
           fi
-          SERVICE_NAME=$(basename $(dirname $(dirname $FILE_PATH)))  # Go up two directories to get service folder
+
+          SERVICE_NAME=$(basename $(dirname $(dirname "$FILE_PATH")))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
-          IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' $FILE_PATH)
+          IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' "$FILE_PATH")
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          # Export outputs for later steps
+          echo "service=$SERVICE_NAME" >> $GITHUB_OUTPUT
+          echo "file=$FILE_PATH" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
           echo "Detected service: $SERVICE_NAME with image: $IMAGE_TAG"
 
       # Step 3: Configure Git for bot commits
@@ -42,6 +65,7 @@ jobs:
 
       # Step 4: Update prod.yaml
       - name: Update prod.yaml
+        if: steps.detect.outputs.service != ''
         run: |
           PROD_FILE="base/services/$SERVICE_NAME/prod/prod.yaml"
           if [ ! -f "$PROD_FILE" ]; then
@@ -57,20 +81,23 @@ jobs:
 
       # Step 5: Create Pull Request
       - name: Create Pull Request
+        if: steps.detect.outputs.service != ''
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Promote ${{ env.SERVICE_NAME }} to Production"
-          body: "Automated PR: promote ${{ env.SERVICE_NAME }} image to production: ${{ env.IMAGE_TAG }}"
+          title: "Promote ${{ steps.detect.outputs.service }} to Production"
+          body: "Automated PR: promote ${{ steps.detect.outputs.service }} image to production: ${{ steps.detect.outputs.image }}"
           base: main
-          branch: promote-${{ env.SERVICE_NAME }}
+          branch: promote-${{ steps.detect.outputs.service }}
 
       # Step 6: Send Slack Notification
       - name: Send Slack Notification
+        if: steps.detect.outputs.service != ''
         uses: slackapi/slack-github-action@v2.1.1
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
-              "text": "PR created to promote *${{ env.SERVICE_NAME }}* image to production: `${{ env.IMAGE_TAG }}`"
+              "text": "PR created to promote *${{ steps.detect.outputs.service }}* image to production: `${{ steps.detect.outputs.image }}`"
             }
