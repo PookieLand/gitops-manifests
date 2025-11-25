@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'base/services/**/staging.yaml'
+      - 'base/services/**/staging/staging.yaml'
 
 jobs:
   promote:
@@ -15,17 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set changed files
+      # Step 2: Detect changed staging.yaml
       - name: Detect changed staging.yaml
         id: files
         run: |
-          FILE_PATH=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep staging.yaml || true)
+          FILE_PATH=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep 'staging/staging.yaml' || true)
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
           if [ -z "$FILE_PATH" ]; then
             echo "No staging.yaml change detected, skipping."
             exit 0
           fi
-          SERVICE_NAME=$(basename $(dirname $FILE_PATH))
+          SERVICE_NAME=$(basename $(dirname $(dirname $FILE_PATH)))  # Go up two dirs to get service folder
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
           IMAGE_TAG=$(yq e '.spec.template.spec.containers[0].image' $FILE_PATH)
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -39,18 +39,19 @@ jobs:
       # Step 4: Update prod.yaml
       - name: Update prod.yaml
         run: |
-          PROD_FILE="base/services/$SERVICE_NAME/prod.yaml"
+          PROD_FILE="base/services/$SERVICE_NAME/prod/prod.yaml"
           if [ ! -f "$PROD_FILE" ]; then
             echo "$PROD_FILE does not exist, skipping."
             exit 0
           fi
+          echo "Updating $PROD_FILE with image $IMAGE_TAG"
           yq eval -i ".spec.template.spec.containers[0].image |= \"$IMAGE_TAG\"" "$PROD_FILE"
           git checkout -b promote-$SERVICE_NAME
           git add "$PROD_FILE"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG"
           git push origin promote-$SERVICE_NAME
 
-      # Step 5: Create PR for production
+      # Step 5: Create Pull Request
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:

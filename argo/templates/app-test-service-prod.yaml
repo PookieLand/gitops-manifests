@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/PookieLand/gitops-manifests.git
     targetRevision: main
-    path: base/services/test-service/prod.yaml
+    path: base/services/test-service/prod
     directory:
       recurse: true
   destination:
