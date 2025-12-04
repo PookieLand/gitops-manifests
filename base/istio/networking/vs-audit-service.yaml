@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: audit-service-vs
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: audit-service
+    app.kubernetes.io/part-of: hrms
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/hrms-gateway
+  http:
+    - name: audit-route
+      match:
+        - uri:
+            prefix: "/api/v1/audit"
+      route:
+        - destination:
+            host: audit-service
+            port:
+              number: 8080
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: connect-failure,refused-stream,unavailable,cancelled,503

@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: leave-service-vs
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: leave-service
+    app.kubernetes.io/part-of: hrms
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/hrms-gateway
+  http:
+    - name: leave-route
+      match:
+        - uri:
+            prefix: "/api/v1/leaves"
+      route:
+        - destination:
+            host: leave-service
+            port:
+              number: 8080
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: connect-failure,refused-stream,unavailable,cancelled,503

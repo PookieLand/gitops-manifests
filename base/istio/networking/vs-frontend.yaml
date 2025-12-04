@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: frontend-vs
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: hrms
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/hrms-gateway
+  http:
+    - name: frontend-route
+      match:
+        - uri:
+            prefix: "/"
+      route:
+        - destination:
+            host: frontend.hrms.svc.cluster.local
+            port:
+              number: 3000
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: connect-failure,refused-stream,unavailable,cancelled,503

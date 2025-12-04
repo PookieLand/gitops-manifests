@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: attendance-service-vs
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: attendance-service
+    app.kubernetes.io/part-of: hrms
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/hrms-gateway
+  http:
+    - name: attendance-route
+      match:
+        - uri:
+            prefix: "/api/v1/attendance"
+      route:
+        - destination:
+            host: attendance-service
+            port:
+              number: 8080
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+        retryOn: connect-failure,refused-stream,unavailable,cancelled,503
