@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: hrms-gateway
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: hrms-gateway
+    app.kubernetes.io/part-of: hrms
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "*"
+      tls:
+        mode: SIMPLE
+        credentialName: hrms-tls-cert
