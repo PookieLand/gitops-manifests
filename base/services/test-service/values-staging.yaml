@@ -2,6 +2,6 @@ replicaCount: 2
 
 image:
   repository: nginx
-  tag: "1.26.1"
+  tag: "1.25.2"
 
 namespace: staging
