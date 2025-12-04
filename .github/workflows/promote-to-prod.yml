@@ -17,6 +17,7 @@ jobs:
     env:
       GIT_AUTHOR_NAME: "GitOps Bot"
       GIT_AUTHOR_EMAIL: "gitops@example.com"
+
     steps:
       # Step 1: Checkout repository
       - name: Checkout repository
@@ -33,27 +34,45 @@ jobs:
         shell: bash
 
       # Step 3: Detect changed staging values
-      - name: Detect changed values-staging.yaml
+      - name: Detect changed staging values
         id: detect
         run: |
           set -euo pipefail
-          FILE_PATH=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'values-staging.yaml' || true)
+
+          # Ensure sufficient git history
+          if [ -f .git/shallow ]; then
+            git fetch --no-tags --prune --unshallow || true
+          else
+            git fetch --no-tags --prune || true
+          fi
+
+          if git rev-parse --verify ${{ github.event.before }} >/dev/null 2>&1; then
+            DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          else
+            DIFF=$(git show --name-only --pretty="" ${{ github.sha }})
+          fi
+
+          FILE_PATH=$(echo "$DIFF" | grep -E 'values-staging.yaml$' || true)
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
           if [ -z "$FILE_PATH" ]; then
-            echo "No values-staging.yaml change detected, skipping."
+            echo "No staging values change detected, skipping."
             exit 0
           fi
 
           SERVICE_NAME=$(basename $(dirname "$FILE_PATH"))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
 
-          # Extract image from staging values
-          IMAGE_TAG=$(yq e '.image' "$FILE_PATH" | tr -d '\r' | tr -d '\n')
+          # Read image from staging values
+          IMAGE_TAG=$(yq e '.image // ""' "$FILE_PATH" | tr -d '\r' | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
           # Export outputs
           echo "service<<EOF" >> $GITHUB_OUTPUT
           echo "$SERVICE_NAME" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "file<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILE_PATH" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
           echo "image<<EOF" >> $GITHUB_OUTPUT
@@ -68,8 +87,8 @@ jobs:
           git config --global user.name "$GIT_AUTHOR_NAME"
           git config --global user.email "$GIT_AUTHOR_EMAIL"
 
-      # Step 5: Update values-production.yaml
-      - name: Update values-production.yaml
+      # Step 5: Update production values
+      - name: Update production values
         if: steps.detect.outputs.service != ''
         run: |
           PROD_VALUES="base/services/$SERVICE_NAME/values-production.yaml"
@@ -79,10 +98,15 @@ jobs:
           fi
 
           echo "Updating $PROD_VALUES image to $IMAGE_TAG"
-          yq eval -i ".image = \"$IMAGE_TAG\"" "$PROD_VALUES"
+          yq eval -i '.image = strenv(IMAGE_TAG)' "$PROD_VALUES"
 
           git add "$PROD_VALUES"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
+        env:
+          IMAGE_TAG: ${{ steps.detect.outputs.image }}
+          SERVICE_NAME: ${{ steps.detect.outputs.service }}
+          GIT_AUTHOR_NAME: ${{ env.GIT_AUTHOR_NAME }}
+          GIT_AUTHOR_EMAIL: ${{ env.GIT_AUTHOR_EMAIL }}
 
       # Step 6: Create Pull Request
       - name: Create Pull Request
@@ -91,7 +115,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Promote ${{ steps.detect.outputs.service }} to Production"
-          body: "Automated PR: promote ${{ steps.detect.outputs.service }} image to production: ${{ steps.detect.outputs.image }}"
+          body: "Automated PR: promote ${{ steps.detect.outputs.service }} image to production: `${{ steps.detect.outputs.image }}`"
           base: main
           branch: promote-${{ steps.detect.outputs.service }}
 
