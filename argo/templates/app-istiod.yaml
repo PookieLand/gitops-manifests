@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istiod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: istiod
+    app.kubernetes.io/part-of: istio
+spec:
+  project: hrms
+  source:
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    chart: istiod
+    targetRevision: 1.22.0
+    helm:
+      releaseName: istiod
+      values: |
+        global:
+          istioNamespace: istio-system
+          proxy:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+        meshConfig:
+          enableAutoMtls: true
+          accessLogFile: /dev/stdout
+          accessLogEncoding: JSON
+          defaultConfig:
+            holdApplicationUntilProxyStarts: true
+          outboundTrafficPolicy:
+            mode: ALLOW_ANY
+        pilot:
+          autoscaleEnabled: true
+          autoscaleMin: 1
+          autoscaleMax: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
