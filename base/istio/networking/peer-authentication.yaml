@@ -1,0 +1,11 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: hrms-mtls
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: hrms-mtls
+    app.kubernetes.io/part-of: hrms
+spec:
+  mtls:
+    mode: STRICT
