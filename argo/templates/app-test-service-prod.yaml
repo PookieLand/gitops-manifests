@@ -1,16 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-service-prod
+  name: test-service-production
   namespace: argocd
 spec:
   project: hrms-prod
   source:
     repoURL: https://github.com/PookieLand/gitops-manifests.git
     targetRevision: main
-    path: base/services/test-service/prod
-    directory:
-      recurse: true
+    path: base/services/test-service
+    helm:
+      valueFiles:
+        - values-production.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: production
