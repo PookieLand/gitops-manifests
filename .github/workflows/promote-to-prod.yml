@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - 'base/services/**/staging/staging.yaml'
+      - 'base/services/**/values-staging.yaml'
 
 jobs:
   promote:
@@ -17,6 +17,7 @@ jobs:
     env:
       GIT_AUTHOR_NAME: "GitOps Bot"
       GIT_AUTHOR_EMAIL: "gitops@example.com"
+
     steps:
       # Step 1: Checkout repository
       - name: Checkout repository
@@ -25,18 +26,20 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      # Step 2: Install yq
       - name: Install yq
         run: |
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
         shell: bash
 
-      # Step 2: Detect changed staging.yaml
-      - name: Detect changed staging.yaml
+      # Step 3: Detect changed staging values
+      - name: Detect changed staging values
         id: detect
         run: |
           set -euo pipefail
-          # Ensure we have sufficient git history for comparing commits
+
+          # Ensure we have sufficient git history
           if [ -f .git/shallow ]; then
             git fetch --no-tags --prune --unshallow || true
           else
@@ -49,22 +52,19 @@ jobs:
             DIFF=$(git show --name-only --pretty="" ${{ github.sha }})
           fi
 
-          FILE_PATH=$(echo "$DIFF" | grep -E 'staging/staging.yaml$' || true)
+          FILE_PATH=$(echo "$DIFF" | grep -E 'values-staging.yaml$' || true)
           echo "FILE_PATH=$FILE_PATH" >> $GITHUB_ENV
           if [ -z "$FILE_PATH" ]; then
-            echo "No staging.yaml change detected, skipping."
+            echo "No staging values change detected, skipping."
             exit 0
           fi
 
-          SERVICE_NAME=$(basename $(dirname $(dirname "$FILE_PATH")))
+          SERVICE_NAME=$(basename $(dirname "$FILE_PATH"))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
 
-          # Read image and sanitize
-          IMAGE_TAG_RAW=$(yq e '.spec.template.spec.containers[0].image // ""' "$FILE_PATH")
-          IMAGE_TAG=$(echo "$IMAGE_TAG_RAW" | tr -d '\r' | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          IMAGE_TAG=$(yq e '.image.repository + ":" + .image.tag' "$FILE_PATH")
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-          # Export outputs
           echo "service<<EOF" >> $GITHUB_OUTPUT
           echo "$SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -79,31 +79,40 @@ jobs:
 
           echo "Detected service: $SERVICE_NAME with image: $IMAGE_TAG"
 
-      # Step 3: Configure Git for bot commits
+      # Step 4: Configure Git for bot commits
       - name: Configure Git
         run: |
           git config --global user.name "$GIT_AUTHOR_NAME"
           git config --global user.email "$GIT_AUTHOR_EMAIL"
 
-      # Step 4: Update prod.yaml
-      - name: Update prod.yaml
+      # Step 5: Update production values
+      - name: Update production values
         if: steps.detect.outputs.service != ''
         run: |
-          PROD_FILE="base/services/$SERVICE_NAME/prod/prod.yaml"
-          if [ ! -f "$PROD_FILE" ]; then
-            echo "$PROD_FILE does not exist, skipping."
+          PROD_VALUES="base/services/$SERVICE_NAME/values-production.yaml"
+          if [ ! -f "$PROD_VALUES" ]; then
+            echo "$PROD_VALUES does not exist, skipping."
             exit 0
           fi
-          echo "Updating $PROD_FILE with image $IMAGE_TAG"
 
-          # Update only the Deployment document
-          yq eval -i 'select(documentIndex == 0) | .spec.template.spec.containers[0].image = strenv(IMAGE_TAG)' "$PROD_FILE"
+          echo "Updating $PROD_VALUES with image $IMAGE_TAG"
 
-          # Commit locally
-          git add "$PROD_FILE"
+          # Split IMAGE_TAG into repository and tag
+          REPO=$(echo "$IMAGE_TAG" | cut -d':' -f1)
+          TAG=$(echo "$IMAGE_TAG" | cut -d':' -f2)
+
+          # Update nested image fields
+          yq eval -i ".image.repository = \"$REPO\" | .image.tag = \"$TAG\"" "$PROD_VALUES"
+
+          git add "$PROD_VALUES"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
+        env:
+          IMAGE_TAG: ${{ steps.detect.outputs.image }}
+          SERVICE_NAME: ${{ steps.detect.outputs.service }}
+          GIT_AUTHOR_NAME: ${{ env.GIT_AUTHOR_NAME }}
+          GIT_AUTHOR_EMAIL: ${{ env.GIT_AUTHOR_EMAIL }}
 
-      # Step 5: Create Pull Request
+      # Step 6: Create Pull Request
       - name: Create Pull Request
         if: steps.detect.outputs.service != ''
         uses: peter-evans/create-pull-request@v5
@@ -114,7 +123,7 @@ jobs:
           base: main
           branch: promote-${{ steps.detect.outputs.service }}
 
-      # Step 6: Send Slack Notification
+      # Step 7: Send Slack Notification
       - name: Send Slack Notification
         if: steps.detect.outputs.service != ''
         uses: slackapi/slack-github-action@v2.1.1
