@@ -19,7 +19,7 @@ spec:
         - name: ecr-registry-secret
       containers:
       - name: attendance-service
-        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service:latest
+        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service:107bff79
         imagePullPolicy: Always
         ports:
         - containerPort: 80
