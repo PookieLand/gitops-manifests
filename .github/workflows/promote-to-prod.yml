@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Ensure sufficient git history
+          # Ensure we have sufficient git history
           if [ -f .git/shallow ]; then
             git fetch --no-tags --prune --unshallow || true
           else
@@ -62,11 +62,9 @@ jobs:
           SERVICE_NAME=$(basename $(dirname "$FILE_PATH"))
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
 
-          # Read image from staging values
-          IMAGE_TAG=$(yq e '.image // ""' "$FILE_PATH" | tr -d '\r' | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          IMAGE_TAG=$(yq e '.image.repository + ":" + .image.tag' "$FILE_PATH")
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-          # Export outputs
           echo "service<<EOF" >> $GITHUB_OUTPUT
           echo "$SERVICE_NAME" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -81,7 +79,7 @@ jobs:
 
           echo "Detected service: $SERVICE_NAME with image: $IMAGE_TAG"
 
-      # Step 4: Configure Git
+      # Step 4: Configure Git for bot commits
       - name: Configure Git
         run: |
           git config --global user.name "$GIT_AUTHOR_NAME"
@@ -97,8 +95,14 @@ jobs:
             exit 0
           fi
 
-          echo "Updating $PROD_VALUES image to $IMAGE_TAG"
-          yq eval -i '.image = strenv(IMAGE_TAG)' "$PROD_VALUES"
+          echo "Updating $PROD_VALUES with image $IMAGE_TAG"
+
+          # Split IMAGE_TAG into repository and tag
+          REPO=$(echo "$IMAGE_TAG" | cut -d':' -f1)
+          TAG=$(echo "$IMAGE_TAG" | cut -d':' -f2)
+
+          # Update nested image fields
+          yq eval -i ".image.repository = \"$REPO\" | .image.tag = \"$TAG\"" "$PROD_VALUES"
 
           git add "$PROD_VALUES"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
@@ -115,7 +119,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Promote ${{ steps.detect.outputs.service }} to Production"
-          body: "Automated PR: promote ${{ steps.detect.outputs.service }} image to production: `${{ steps.detect.outputs.image }}`"
+          body: "Automated PR: promote ${{ steps.detect.outputs.service }} image to production: ${{ steps.detect.outputs.image }}"
           base: main
           branch: promote-${{ steps.detect.outputs.service }}
 
