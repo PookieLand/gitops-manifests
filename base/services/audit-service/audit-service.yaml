@@ -19,7 +19,7 @@ spec:
         - name: ecr-registry-secret
       containers:
       - name: audit-service
-        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/audit-service:latest
+        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/audit-service:968e524a
         imagePullPolicy: Always
         ports:
         - containerPort: 80
