@@ -5,3 +5,6 @@ image:
   tag: 65400f27
 
 namespace: staging
+
+service:
+  nodePort: 30006
