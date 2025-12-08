@@ -1,23 +1,23 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: test-service-staging
-  namespace: argocd
-spec:
-  project: hrms-staging
-  source:
-    repoURL: https://github.com/PookieLand/gitops-manifests.git
-    targetRevision: main
-    path: base/services/test-service
-    helm:
-      valueFiles:
-        - values-staging.yaml
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: staging
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: test-service-staging
+#   namespace: argocd
+# spec:
+#   project: hrms-staging
+#   source:
+#     repoURL: https://github.com/PookieLand/gitops-manifests.git
+#     targetRevision: main
+#     path: base/services/test-service
+#     helm:
+#       valueFiles:
+#         - values-staging.yaml
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: staging
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
