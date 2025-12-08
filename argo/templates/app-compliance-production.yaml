@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-service-production
-  namespace: argocd
+  name: compliance-service-production
+  namespace: {{ .Values.metadata.namespace }}
 spec:
   project: hrms-production
   source:
-    repoURL: https://github.com/PookieLand/gitops-manifests.git
-    targetRevision: main
-    path: base/services/test-service
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: "{{ .Values.spec.source.path }}/compliance-service"
     helm:
       valueFiles:
         - values-production.yaml
   destination:
-    server: https://kubernetes.default.svc
+    server: {{ .Values.spec.destination.server }}
     namespace: production
   syncPolicy:
     automated:

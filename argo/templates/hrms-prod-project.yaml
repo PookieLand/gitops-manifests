@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: hrms-prod
+  name: hrms-production
   namespace: argocd
 spec:
-  description: Project for all HRMS prod applications
+  description: Project for all HRMS production applications
   sourceRepos:
     - '*'  # allow any repo 
   destinations:

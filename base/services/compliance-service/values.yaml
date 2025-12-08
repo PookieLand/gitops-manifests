@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
+  tag: 65400f27
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80
+  nodePort: 30006
+
+env:
+  APP_NAME: "Compliance Service"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "hrms_compliance_db"
+  DB_USER: "hrms_user"
+  DB_PASSWORD: "hrms_password"
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
