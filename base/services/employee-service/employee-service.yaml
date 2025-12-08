@@ -19,7 +19,7 @@ spec:
         - name: ecr-registry-secret
       containers:
       - name: employee-service
-        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/employee-service:latest
+        image: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/employee-service:21e6a0f1
         imagePullPolicy: Always
         ports:
         - containerPort: 80
