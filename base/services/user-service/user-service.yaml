@@ -33,9 +33,15 @@ spec:
         - name: DB_NAME
           value: "hrms_users_db"
         - name: DB_USER
-          value: "hrms_user"
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: MYSQL_USER
         - name: DB_PASSWORD
-          value: "hrms_password"
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials
+              key: MYSQL_PASSWORD
         - name: AUDIT_SERVICE_URL
           value: "http://audit-service:80/api/v1"
         - name: JWKS_URL

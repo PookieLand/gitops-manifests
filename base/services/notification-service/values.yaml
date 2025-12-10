@@ -18,6 +18,7 @@ env:
   DB_HOST: "mysql"
   DB_PORT: "3306"
   DB_NAME: "hrms_notifications_db"
-  DB_USER: "hrms_user"
-  DB_PASSWORD: "hrms_password"
+  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-credentials`.
+  # The Helm chart templates should be adjusted to read these values from the Secret
+  # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
