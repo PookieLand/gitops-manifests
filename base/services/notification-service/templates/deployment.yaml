@@ -27,9 +27,21 @@ spec:
           ports:
             - containerPort: 80
           env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: password
 {{- range $key, $value := .Values.env }}
+{{- if and (ne $key "DB_USER") (ne $key "DB_PASSWORD") }}
             - name: {{ $key }}
               value: "{{ $value }}"
+{{- end }}
 {{- end }}
           resources:
             requests:
