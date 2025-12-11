@@ -35,12 +35,12 @@ spec:
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: mysql-credentials
+              name: mysql-staging
               key: MYSQL_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-credentials
+              name: mysql-staging
               key: MYSQL_PASSWORD
         - name: JWKS_URL
           value: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
