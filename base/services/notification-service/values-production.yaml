@@ -5,3 +5,4 @@ image:
 namespace: production
 service:
   nodePort: 30011
+secretName: mysql-production

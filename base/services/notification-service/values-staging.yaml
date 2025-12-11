@@ -8,3 +8,5 @@ namespace: staging
 
 service:
   nodePort: 30010
+
+secretName: mysql-staging
