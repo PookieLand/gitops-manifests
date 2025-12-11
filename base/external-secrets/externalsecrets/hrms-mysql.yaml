@@ -1,0 +1,26 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: hrms-mysql
+  namespace: external-secrets
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: aws-secrets
+    kind: ClusterSecretStore
+  target:
+    name: hrms-mysql
+    creationPolicy: Owner
+  data:
+    - secretKey: MYSQL_PASSWORD
+      remoteRef:
+        key: hrms/mysql
+        property: MYSQL_PASSWORD
+    - secretKey: MYSQL_ROOT_PASSWORD
+      remoteRef:
+        key: hrms/mysql
+        property: MYSQL_ROOT_PASSWORD
+    - secretKey: MYSQL_USER
+      remoteRef:
+        key: hrms/mysql
+        property: MYSQL_USER

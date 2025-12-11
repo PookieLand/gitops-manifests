@@ -1,0 +1,22 @@
+installCRDs: true
+
+replicaCount: 1
+
+serviceAccount:
+  name: external-secrets
+  annotations: {}
+
+resources:
+  limits:
+    cpu: "200m"
+    memory: "300Mi"
+  requests:
+    cpu: "50m"
+    memory: "100Mi"
+
+webhook:
+  enabled: true
+  port: 9443
+
+certController:
+  enabled: true
