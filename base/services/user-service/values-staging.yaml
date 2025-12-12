@@ -1,0 +1,12 @@
+namespace: staging
+
+replicaCount: 2
+
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/user-service
+  tag: 37bd4cca
+
+service:
+  nodePort: 30018
+
+mysqlSecretName: "mysql-staging"
