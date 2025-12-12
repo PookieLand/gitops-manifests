@@ -1,4 +1,4 @@
-namespace: hrms-production
+namespace: production
 
 replicaCount: 3
 

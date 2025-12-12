@@ -1,4 +1,4 @@
-namespace: hrms-staging
+namespace: staging
 
 replicaCount: 2
 
