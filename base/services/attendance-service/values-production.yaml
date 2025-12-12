@@ -7,7 +7,7 @@ image:
 namespace: production
 
 service:
-  nodePort: 30004
+  nodePort: 30019
 
 envSecret:
   name: mysql-production
