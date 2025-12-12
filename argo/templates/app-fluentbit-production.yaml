@@ -2,23 +2,20 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: fluent-bit-production
-  namespace: argocd
+  namespace: {{ .Values.metadata.namespace }}
 spec:
-  project: default
-
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: production
-
+  project: hrms-production
   source:
-    repoURL: "https://fluent.github.io/helm-charts"
-    chart: fluent-bit
-    targetRevision: "0.53.0"
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    path: "{{ .Values.spec.source.path }}/fluentbit"
     helm:
       valueFiles:
-        - base/fluentbit/values-shared.yaml
-        - base/fluentbit/values-production.yaml
-
+        - values-shared.yaml
+        - values-production.yaml
+  destination:
+    server: {{ .Values.spec.destination.server }}
+    namespace: production
   syncPolicy:
     automated:
       prune: true

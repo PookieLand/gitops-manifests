@@ -1,0 +1,10 @@
+apiVersion: v2
+name: fluentbit
+description: Fluent Bit for Kubernetes logs
+type: application
+version: 0.1.0
+appVersion: "4.0.7"
+dependencies:
+  - name: fluent-bit
+    version: 0.53.0
+    repository: "https://fluent.github.io/helm-charts"
