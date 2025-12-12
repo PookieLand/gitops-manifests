@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fluent-bit-staging
+  namespace: argocd
+spec:
+  project: default
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+
+  source:
+    repoURL: "https://fluent.github.io/helm-charts"
+    chart: fluent-bit
+    targetRevision: "0.53.0"
+    helm:
+      valueFiles:
+        - base/fluentbit/values-shared.yaml
+        - base/fluentbit/values-staging.yaml
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
