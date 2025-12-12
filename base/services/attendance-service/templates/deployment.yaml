@@ -35,12 +35,12 @@ spec:
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secretRef }}
+              name: {{ .Values.envSecret.name }}
               key: MYSQL_USER
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secretRef }}
+              name: {{ .Values.envSecret.name }}
               key: MYSQL_PASSWORD
         - name: EMPLOYEE_SERVICE_URL
           value: "{{ .Values.env.EMPLOYEE_SERVICE_URL }}"
