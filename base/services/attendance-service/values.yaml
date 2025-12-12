@@ -1,0 +1,28 @@
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service
+  tag: c29b7067
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+env:
+  APP_NAME: "Attendance Management Service"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "hrms_attendance_db"
+  EMPLOYEE_SERVICE_URL: "http://employee-service:80/api/v1"
+  LEAVE_SERVICE_URL: "http://leave-service:80/api/v1"
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
+  COMPLIANCE_SERVICE_URL: "http://compliance-service:80/api/v1"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"

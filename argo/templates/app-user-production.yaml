@@ -1,18 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hrms-attendance-service
+  name: user-service-production
   namespace: {{ .Values.metadata.namespace }}
 spec:
-  project: hrms
+  project: hrms-production
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
-    path: "{{ .Values.spec.source.path }}/attendance-service"
+    path: "{{ .Values.spec.source.path }}/user-service"
+    helm:
+      valueFiles:
+        - values-production.yaml
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: hrms
+    namespace: production
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

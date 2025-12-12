@@ -1,0 +1,13 @@
+replicaCount: 2
+
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service
+  tag: c29b7067
+
+namespace: production
+
+service:
+  nodePort: 30019
+
+envSecret:
+  name: mysql-production

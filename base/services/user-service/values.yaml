@@ -1,0 +1,32 @@
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-registry-secret
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+env:
+  APP_NAME: "User Management Service"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "hrms_users_db"
+  DB_USER_SECRET: "mysql-staging"
+  DB_USER_KEY: "MYSQL_USER"
+  DB_PASSWORD_SECRET: "mysql-staging"
+  DB_PASSWORD_KEY: "MYSQL_PASSWORD"
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"

@@ -1,0 +1,24 @@
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/audit-service
+  tag: 1c2fb7f5
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+env:
+  APP_NAME: "Audit Service"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "audit_service_db"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+
