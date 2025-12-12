@@ -16,8 +16,8 @@ spec:
     targetRevision: "0.53.0"
     helm:
       valueFiles:
-        - fluentbit/values-shared.yaml
-        - fluentbit/values-staging.yaml
+        - base/fluentbit/values-shared.yaml
+        - base/fluentbit/values-staging.yaml
 
   syncPolicy:
     automated:
