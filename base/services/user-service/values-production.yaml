@@ -9,4 +9,4 @@ image:
 service:
   nodePort: 30012
 
-mysqlSecretName: mysql-production
+secretRef: mysql-production

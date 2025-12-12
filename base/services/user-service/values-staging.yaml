@@ -9,4 +9,4 @@ image:
 service:
   nodePort: 30013
 
-mysqlSecretName: mysql-staging
+secretRef: mysql-staging
