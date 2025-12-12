@@ -1,0 +1,28 @@
+namespace: hrms
+
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30002
+
+env:
+  APP_NAME: "Leave Management Service"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "hrms_leaves_db"
+  EMPLOYEE_SERVICE_URL: "http://employee-service:80/api/v1"
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
+  COMPLIANCE_SERVICE_URL: "http://compliance-service:80/api/v1"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+
+mysqlSecretName: ""
+mysqlUserKey: "MYSQL_USER"
+mysqlPasswordKey: "MYSQL_PASSWORD"
