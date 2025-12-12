@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/employee-service
+  tag: ca9e4176
+
+namespace: staging
+
+service:
+  nodePort: 30016
+
+secretRef: mysql-staging
