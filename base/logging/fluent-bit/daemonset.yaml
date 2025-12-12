@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: logging
+  labels:
+    app: fluent-bit
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      serviceAccountName: fluent-bit
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: fluent-bit
+          image: fluent/fluent-bit:2.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          env:
+            - name: OPENSEARCH_HOST
+              value: "opensearch.example.com"
+            - name: OPENSEARCH_PORT
+              value: "9200"
+          envFrom:
+            - secretRef:
+                name: fluent-bit-opensearch-secret
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: varrun
+              mountPath: /var/run
+            - name: config
+              mountPath: /fluent-bit/etc/
+            - name: scripts
+              mountPath: /fluent-bit/scripts
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: varrun
+          hostPath:
+            path: /var/run
+        - name: config
+          configMap:
+            name: fluent-bit-config
+        - name: scripts
+          configMap:
+            name: fluent-bit-config
