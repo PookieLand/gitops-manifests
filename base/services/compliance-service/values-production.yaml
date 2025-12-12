@@ -8,3 +8,6 @@ namespace: production
 
 service:
   nodePort: 30008
+
+envSecret:
+  name: mysql-production

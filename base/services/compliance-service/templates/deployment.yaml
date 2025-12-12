@@ -31,6 +31,18 @@ spec:
             - name: {{ $key }}
               value: "{{ $value }}"
             {{- end }}
+            {{- if .Values.envSecret.name }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.envSecret.name }}
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.envSecret.name }}
+                  key: MYSQL_PASSWORD
+            {{- end }}
           resources:
             requests:
               memory: "256Mi"

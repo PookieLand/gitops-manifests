@@ -15,7 +15,7 @@ env:
   DB_HOST: "mysql"
   DB_PORT: "3306"
   DB_NAME: "hrms_compliance_db"
-  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-credentials`.
+  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-staging or mysql-production`.
   # The Helm chart templates should be adjusted to read these values from the Secret
   # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
   AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
