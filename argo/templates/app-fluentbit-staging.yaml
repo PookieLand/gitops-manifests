@@ -12,7 +12,7 @@ spec:
     helm:
       valueFiles:
         - values-shared.yaml
-        - values-production.yaml
+        - values-staging.yaml
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: staging
