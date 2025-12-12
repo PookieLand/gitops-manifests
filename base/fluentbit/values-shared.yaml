@@ -1,0 +1,65 @@
+backend:
+  type: opensearch
+
+serviceAccount:
+  create: true
+
+rbac:
+  create: true
+
+config:
+  service:
+    flush: 1
+    log_level: info
+
+  inputs: |
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            docker
+        Tag               kube.*
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     50MB
+
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Merge_Log           On
+        Keep_Log            On
+
+    [FILTER]
+        Name                record_modifier
+        Match               *
+        Record              environment ${ENVIRONMENT}
+
+  outputs: |
+    [OUTPUT]
+        Name                opensearch
+        Match               *
+        Host                ${OPENSEARCH_HOST}
+        Port                ${OPENSEARCH_PORT}
+        Index               kubernetes-${ENVIRONMENT}
+        Type                _doc
+        Suppress_Type_Name  On
+        tls                 On
+        tls.verify          Off
+
+env:
+  - name: OPENSEARCH_PORT
+    value: "9200"
+  - name: OPENSEARCH_HOST
+    valueFrom:
+      secretKeyRef:
+        name: opensearch-credentials
+        key: host
+  - name: OPENSEARCH_USER
+    valueFrom:
+      secretKeyRef:
+        name: opensearch-credentials
+        key: username
+  - name: OPENSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: opensearch-credentials
+        key: password
