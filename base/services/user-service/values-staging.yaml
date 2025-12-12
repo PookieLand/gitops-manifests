@@ -7,6 +7,6 @@ image:
   tag: 37bd4cca
 
 service:
-  nodePort: 30018
+  nodePort: 30013
 
-mysqlSecretName: "mysql-staging"
+mysqlSecretName: mysql-staging
