@@ -1,4 +1,2 @@
 fluent-bit:
-  env:
-    - name: ENVIRONMENT
-      value: "production"
+  environment: "production"

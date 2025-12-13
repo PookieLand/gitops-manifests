@@ -72,3 +72,7 @@ fluent-bit:
     #     secretKeyRef:
     #       name: opensearch-credentials
     #       key: password
+
+  envWithTpl:
+    - name: ENVIRONMENT
+      value: "{{ .Values.environment }}"
