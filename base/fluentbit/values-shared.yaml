@@ -73,7 +73,6 @@ fluent-bit:
           Match               kube.*
           Host                ${OPENSEARCH_HOST}
           Port                ${OPENSEARCH_PORT}
-          Index               logs-kubernetes-${ENVIRONMENT}
           Type                _doc
           Suppress_Type_Name  On
           tls                 Off
