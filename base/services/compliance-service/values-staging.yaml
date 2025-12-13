@@ -1,13 +1,9 @@
 replicaCount: 1
-
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
-  tag: 65400f27
-
+  tag: eb8ed726
 namespace: staging
-
 service:
   nodePort: 30006
-
 envSecret:
   name: mysql-staging
