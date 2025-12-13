@@ -2,6 +2,13 @@ fluent-bit:
   backend:
     type: opensearch
 
+  # Let the upstream fluent-bit subchart render the [SERVICE] block
+  # (it expects a string at .Values.config.service). Provide the
+  # numeric/string values the chart uses instead of supplying a
+  # table for `.config.service` which causes the coalesce/type error.
+  flush: 1
+  logLevel: info
+
   serviceAccount:
     create: true
 
@@ -9,10 +16,6 @@ fluent-bit:
     create: true
 
   config:
-    service:
-      flush: 1
-      log_level: info
-
     inputs: |
       [INPUT]
           Name              tail
