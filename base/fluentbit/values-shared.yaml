@@ -42,10 +42,13 @@ config:
         Index               kubernetes-${ENVIRONMENT}
         Type                _doc
         Suppress_Type_Name  On
-        HTTP_User           ${OPENSEARCH_USER}
-        HTTP_Passwd         ${OPENSEARCH_PASSWORD}
         tls                 On
         tls.verify          Off
+
+  # Add later
+  # HTTP_User           ${OPENSEARCH_USER}
+  # HTTP_Passwd         ${OPENSEARCH_PASSWORD}
+
 
 env:
   - name: OPENSEARCH_PORT
@@ -55,13 +58,13 @@ env:
       secretKeyRef:
         name: opensearch-credentials
         key: host
-  - name: OPENSEARCH_USER
-    valueFrom:
-      secretKeyRef:
-        name: opensearch-credentials
-        key: username
-  - name: OPENSEARCH_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: opensearch-credentials
-        key: password
+  # - name: OPENSEARCH_USER
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: opensearch-credentials
+  #       key: username
+  # - name: OPENSEARCH_PASSWORD
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: opensearch-credentials
+  #       key: password
