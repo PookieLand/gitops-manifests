@@ -24,18 +24,48 @@ fluent-bit:
           Tag               kube.*
           DB                /var/log/flb_kube.db
           Mem_Buf_Limit     50MB
+          Refresh_Interval  5
+          Skip_Long_Lines   On
 
     filters: |
       [FILTER]
           Name                kubernetes
           Match               kube.*
+          Kube_URL            https://kubernetes.default.svc:443
+          Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+          Kube_Tag_Prefix     kube.var.log.containers.
           Merge_Log           On
-          Keep_Log            On
+          Keep_Log            Off
+          K8S-Logging.Parser  On
+          K8S-Logging.Exclude On
+          Labels              On
+          Annotations         Off
 
       [FILTER]
-          Name                record_modifier
-          Match               *
-          Record              environment ${ENVIRONMENT}
+          Name                nest
+          Match               kube.*
+          Operation           lift
+          Nested_under        kubernetes
+          Add_prefix          k8s_
+
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Add                 environment ${ENVIRONMENT}
+          Add                 cluster ${CLUSTER_NAME}
+          Copy                k8s_pod_name pod_name
+          Copy                k8s_namespace_name namespace
+          Copy                k8s_container_name container_name
+          Copy                k8s_labels service
+
+      [FILTER]
+          Name                nest
+          Match               kube.*
+          Operation           nest
+          Wildcard            k8s_*
+          Nest_under          kubernetes
+          Remove_prefix       k8s_
 
     outputs: |
       [OUTPUT]
@@ -43,10 +73,17 @@ fluent-bit:
           Match               kube.*
           Host                ${OPENSEARCH_HOST}
           Port                ${OPENSEARCH_PORT}
-          Index               kubernetes-${ENVIRONMENT}
+          Index               logs-kubernetes-${ENVIRONMENT}
           Type                _doc
           Suppress_Type_Name  On
           tls                 Off
+          Logstash_Format     On
+          Logstash_Prefix     logs-kubernetes-${ENVIRONMENT}
+          Logstash_DateFormat %Y.%m.%d
+          Time_Key            @timestamp
+          Generate_ID         On
+          Replace_Dots        On
+          Trace_Error         On
 
     # Add later
     # HTTP_User           ${OPENSEARCH_USER}
@@ -63,6 +100,8 @@ fluent-bit:
         secretKeyRef:
           name: opensearch-credentials
           key: host
+    - name: CLUSTER_NAME
+      value: "hrms-cluster"
     # - name: OPENSEARCH_USER
     #   valueFrom:
     #     secretKeyRef:
