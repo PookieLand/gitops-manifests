@@ -46,12 +46,13 @@ fluent-bit:
           Index               kubernetes-${ENVIRONMENT}
           Type                _doc
           Suppress_Type_Name  On
-          tls                 On
-          tls.verify          Off
+          tls                 Off
 
     # Add later
     # HTTP_User           ${OPENSEARCH_USER}
     # HTTP_Passwd         ${OPENSEARCH_PASSWORD}
+    # tls.verify          Off
+
 
 
   env:
