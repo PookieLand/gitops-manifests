@@ -1,0 +1,18 @@
+image:
+  repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/frontend
+  tag: "fe0c21f0"
+  pullPolicy: Always
+
+containerPort: 3000
+
+service:
+  type: NodePort
+  port: 3000
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
