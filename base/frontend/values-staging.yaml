@@ -7,4 +7,4 @@ image:
   tag: fe0c21f0
 
 service:
-  nodePort: 30000
+  nodePort: 30030
