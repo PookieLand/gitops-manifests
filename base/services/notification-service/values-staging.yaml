@@ -1,12 +1,8 @@
 replicaCount: 1
-
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/notification-service
-  tag: 1a2a5199
-
+  tag: e4331c71
 namespace: staging
-
 service:
   nodePort: 30010
-
 secretName: mysql-staging
