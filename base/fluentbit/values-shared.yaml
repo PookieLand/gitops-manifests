@@ -59,6 +59,20 @@ fluent-bit:
           Copy                k8s_container_name container_name
           Copy                k8s_labels service
 
+      # Extract service name from pod name and labels
+      # This Lua script enriches logs with service_name field
+      [FILTER]
+          Name                lua
+          Match               kube.*
+          Script              /fluent-bit/scripts/extract_service.lua
+          Call                extract_service_from_pod
+
+      # Rewrite tags based on service name for routing to service-specific indices
+      [FILTER]
+          Name                rewrite_tag
+          Match               kube.*
+          Rule                "service_name (.+)" "service.$1" false
+
       [FILTER]
           Name                nest
           Match               kube.*
@@ -68,6 +82,24 @@ fluent-bit:
           Remove_prefix       k8s_
 
     outputs: |
+      # Service-specific output - routes logs to service-prefixed indices
+      [OUTPUT]
+          Name                opensearch
+          Match               service.*
+          Host                ${OPENSEARCH_HOST}
+          Port                ${OPENSEARCH_PORT}
+          Type                _doc
+          Suppress_Type_Name  On
+          tls                 Off
+          Logstash_Format     On
+          Logstash_Prefix     logs-${ENVIRONMENT}-${SERVICE}
+          Logstash_DateFormat %Y.%m.%d
+          Time_Key            @timestamp
+          Generate_ID         On
+          Replace_Dots        On
+          Trace_Error         On
+
+      # Fallback output for non-service logs (system components)
       [OUTPUT]
           Name                opensearch
           Match               kube.*
@@ -77,7 +109,7 @@ fluent-bit:
           Suppress_Type_Name  On
           tls                 Off
           Logstash_Format     On
-          Logstash_Prefix     logs-kubernetes-${ENVIRONMENT}
+          Logstash_Prefix     logs-${ENVIRONMENT}-system
           Logstash_DateFormat %Y.%m.%d
           Time_Key            @timestamp
           Generate_ID         On
