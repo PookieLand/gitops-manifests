@@ -13,5 +13,5 @@ hpa:
   namespace: staging
   targetDeployment: compliance-service
   minReplicas: 1
-  maxReplicas: 5
+  maxReplicas: 2
   targetCPUUtilizationPercentage: 70

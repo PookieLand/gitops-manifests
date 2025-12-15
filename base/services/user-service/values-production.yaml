@@ -16,5 +16,5 @@ hpa:
   namespace: production
   targetDeployment: user-service
   minReplicas: 1
-  maxReplicas: 5
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 70
