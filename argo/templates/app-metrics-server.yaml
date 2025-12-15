@@ -11,7 +11,9 @@ spec:
     targetRevision: 3.13.0
     helm:
       values: |
-        # You can override default values here if needed
+        args:
+          - --kubelet-insecure-tls
+          - --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
