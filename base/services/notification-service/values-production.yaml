@@ -6,11 +6,11 @@ namespace: production
 service:
   nodePort: 30011
 secretName: mysql-production
-  hpa:
-    enabled: true
-    name: notification-service-hpa
-    namespace: production
-    targetDeployment: notification-service
-    minReplicas: 1
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
+hpa:
+  enabled: true
+  name: notification-service-hpa
+  namespace: production
+  targetDeployment: notification-service
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
