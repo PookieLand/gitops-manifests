@@ -7,3 +7,11 @@ service:
   nodePort: 30020
 envSecret:
   name: mysql-staging
+hpa:
+  enabled: true
+  name: attendance-service-hpa
+  namespace: staging
+  targetDeployment: attendance-service
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70

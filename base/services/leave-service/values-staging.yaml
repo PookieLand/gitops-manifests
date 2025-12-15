@@ -6,3 +6,12 @@ image:
 service:
   nodePort: 30017
 mysqlSecretName: "mysql-staging"
+hpa:
+  enabled: true
+  name: leave-service-hpa
+  namespace: staging
+  targetDeployment: leave-service
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+

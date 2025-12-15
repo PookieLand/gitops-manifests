@@ -10,3 +10,11 @@ service:
   nodePort: 30018
 
 mysqlSecretName: "mysql-production"
+hpa:
+  enabled: true
+  name: leave-service-hpa
+  namespace: production
+  targetDeployment: leave-service
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70

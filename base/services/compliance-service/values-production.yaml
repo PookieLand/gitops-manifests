@@ -13,5 +13,5 @@ hpa:
   namespace: production
   targetDeployment: compliance-service
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 70
