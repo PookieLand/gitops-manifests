@@ -2,7 +2,7 @@ namespace: staging
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/leave-service
-  tag: "d27dd61a"
+  tag: "47952936"
 service:
   nodePort: 30017
 mysqlSecretName: "mysql-staging"
