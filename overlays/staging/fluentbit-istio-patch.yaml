@@ -1,0 +1,14 @@
+# Patch to disable Istio sidecar injection for Fluentbit
+# Fluentbit is a system component and doesn't need Istio service mesh
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "false"
+      annotations:
+        sidecar.istio.io/inject: "false"
