@@ -7,3 +7,11 @@ service:
   nodePort: 30008
 envSecret:
   name: mysql-production
+hpa:
+  enabled: true
+  name: compliance-service-hpa
+  namespace: production
+  targetDeployment: compliance-service
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
