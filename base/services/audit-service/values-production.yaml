@@ -1,16 +1,11 @@
 replicaCount: 1
-
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/audit-service
-  tag: 1c2fb7f5
-
+  tag: 13a03976
 namespace: production
-
 service:
   nodePort: 30015
-
 secretRef: mysql-production
-
 hpa:
   enabled: true
   name: audit-service-hpa
