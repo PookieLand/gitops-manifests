@@ -16,6 +16,6 @@ hpa:
   name: audit-service-hpa
   namespace: production
   targetDeployment: audit-service
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 70
