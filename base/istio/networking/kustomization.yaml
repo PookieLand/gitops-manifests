@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - dr-frontend.yaml
+  - dr-services.yaml
+  - gateway.yaml
+  - peer-authentication.yaml
+  - vs-attendance-service.yaml
+  - vs-audit-service.yaml
+  - vs-compliance-service.yaml
+  - vs-employee-service.yaml
+  - vs-frontend.yaml
+  - vs-leave-service.yaml
+  - vs-notification-service.yaml
+  - vs-user-service.yaml
