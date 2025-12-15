@@ -15,6 +15,16 @@ fluent-bit:
   rbac:
     create: true
 
+  # Mount the Lua script from ConfigMap
+  volumeMounts:
+    - name: lua-scripts
+      mountPath: /fluent-bit/scripts
+
+  daemonSetVolumes:
+    - name: lua-scripts
+      configMap:
+        name: fluentbit-lua-scripts
+
   config:
     inputs: |
       [INPUT]
@@ -68,10 +78,11 @@ fluent-bit:
           Call                extract_service_from_pod
 
       # Rewrite tags based on service name for routing to service-specific indices
+      # Format: Match rule "{field} {regex}" "{output_tag}" {keep}
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
-          Rule                "service_name (.+)" "service.$1" false
+          Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" false
 
       [FILTER]
           Name                nest
@@ -83,6 +94,7 @@ fluent-bit:
 
     outputs: |
       # Service-specific output - routes logs to service-prefixed indices
+      # Uses service_name field extracted by Lua script to build index name
       [OUTPUT]
           Name                opensearch
           Match               service.*
@@ -92,7 +104,7 @@ fluent-bit:
           Suppress_Type_Name  On
           tls                 Off
           Logstash_Format     On
-          Logstash_Prefix     logs-${ENVIRONMENT}-${SERVICE}
+          Logstash_Prefix     logs-${ENVIRONMENT}-${FLUENTBIT_TAG_PART1}
           Logstash_DateFormat %Y.%m.%d
           Time_Key            @timestamp
           Generate_ID         On
