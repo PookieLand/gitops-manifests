@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/notification-service
-  tag: e4331c71
+  tag: f1ef5489
 namespace: staging
 service:
   nodePort: 30010
