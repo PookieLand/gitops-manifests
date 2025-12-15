@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service
-  tag: "865193e7"
+  tag: "bef21858"
 namespace: staging
 service:
   nodePort: 30020
