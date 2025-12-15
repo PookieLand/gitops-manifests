@@ -1,0 +1,139 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+# Define resources
+resources: []
+
+# Create ConfigMap from Lua script
+configMapGenerator:
+  - name: fluentbit-lua-scripts
+    files:
+      - scripts/extract_service.lua
+    options:
+      disableNameSuffixHash: true
+
+# Helm chart dependency
+helmCharts:
+  - name: fluentbit
+    repo: https://fluent.github.io/helm-charts
+    version: 0.53.0
+    releaseName: fluent-bit
+    namespace: default
+    valuesFile: values-shared.yaml
+    valuesInline:
+      fluent-bit:
+        backend:
+          type: opensearch
+        flush: 1
+        logLevel: info
+        serviceAccount:
+          create: true
+        rbac:
+          create: true
+        # ConfigMap volume mount for Lua scripts
+        volumeMounts:
+          - name: lua-scripts
+            mountPath: /fluent-bit/scripts
+        daemonSetVolumes:
+          - name: lua-scripts
+            configMap:
+              name: fluentbit-lua-scripts
+        config:
+          inputs: |
+            [INPUT]
+                Name              tail
+                Path              /var/log/containers/*.log
+                Parser            docker
+                Tag               kube.*
+                DB                /var/log/flb_kube.db
+                Mem_Buf_Limit     50MB
+                Refresh_Interval  5
+                Skip_Long_Lines   On
+          filters: |
+            [FILTER]
+                Name                kubernetes
+                Match               kube.*
+                Kube_URL            https://kubernetes.default.svc:443
+                Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+                Kube_Tag_Prefix     kube.var.log.containers.
+                Merge_Log           On
+                Keep_Log            Off
+                K8S-Logging.Parser  On
+                K8S-Logging.Exclude On
+                Labels              On
+                Annotations         Off
+            [FILTER]
+                Name                nest
+                Match               kube.*
+                Operation           lift
+                Nested_under        kubernetes
+                Add_prefix          k8s_
+            [FILTER]
+                Name                modify
+                Match               kube.*
+                Add                 environment staging
+                Add                 cluster hrms-cluster
+                Copy                k8s_pod_name pod_name
+                Copy                k8s_namespace_name namespace
+                Copy                k8s_container_name container_name
+                Copy                k8s_labels service
+            [FILTER]
+                Name                lua
+                Match               kube.*
+                Script              /fluent-bit/scripts/extract_service.lua
+                Call                extract_service_from_pod
+            [FILTER]
+                Name                rewrite_tag
+                Match               kube.*
+                Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" false
+            [FILTER]
+                Name                nest
+                Match               kube.*
+                Operation           nest
+                Wildcard            k8s_*
+                Nest_under          kubernetes
+                Remove_prefix       k8s_
+          outputs: |
+            [OUTPUT]
+                Name                opensearch
+                Match               service.*
+                Host                ${OPENSEARCH_HOST}
+                Port                ${OPENSEARCH_PORT}
+                Type                _doc
+                Suppress_Type_Name  On
+                tls                 Off
+                Logstash_Format     On
+                Logstash_Prefix     logs-staging-${FLUENTBIT_TAG_PART1}
+                Logstash_DateFormat %Y.%m.%d
+                Time_Key            @timestamp
+                Generate_ID         On
+                Replace_Dots        On
+                Trace_Error         On
+            [OUTPUT]
+                Name                opensearch
+                Match               kube.*
+                Host                ${OPENSEARCH_HOST}
+                Port                ${OPENSEARCH_PORT}
+                Type                _doc
+                Suppress_Type_Name  On
+                tls                 Off
+                Logstash_Format     On
+                Logstash_Prefix     logs-staging-system
+                Logstash_DateFormat %Y.%m.%d
+                Time_Key            @timestamp
+                Generate_ID         On
+                Replace_Dots        On
+                Trace_Error         On
+        env:
+          - name: OPENSEARCH_PORT
+            value: "9200"
+          - name: OPENSEARCH_HOST
+            valueFrom:
+              secretKeyRef:
+                name: opensearch-credentials
+                key: host
+          - name: CLUSTER_NAME
+            value: "hrms-cluster"
