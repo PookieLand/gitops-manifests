@@ -10,3 +10,12 @@ service:
   nodePort: 30015
 
 secretRef: mysql-production
+
+hpa:
+  enabled: true
+  name: audit-service-hpa
+  namespace: production
+  targetDeployment: audit-service
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70

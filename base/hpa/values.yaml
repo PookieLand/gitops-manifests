@@ -1,0 +1,7 @@
+enabled: false
+name: ""
+namespace: ""
+targetDeployment: ""
+minReplicas: 1
+maxReplicas: 5
+targetCPUUtilizationPercentage: 60

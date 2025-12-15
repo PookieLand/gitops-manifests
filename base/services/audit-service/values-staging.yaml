@@ -6,3 +6,12 @@ namespace: staging
 service:
   nodePort: 30014
 secretRef: mysql-staging
+
+hpa:
+  enabled: true
+  name: audit-service-hpa
+  namespace: staging
+  targetDeployment: audit-service
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60

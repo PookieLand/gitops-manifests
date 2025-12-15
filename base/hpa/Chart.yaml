@@ -1,0 +1,4 @@
+apiVersion: v2
+name: hpa
+version: 0.1.0
+description: A reusable Horizontal Pod Autoscaler Helm chart
