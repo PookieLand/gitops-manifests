@@ -3,3 +3,7 @@ name: compliance-service
 description: Helm chart for HRMS compliance microservice
 version: 1.0.0
 appVersion: "1.0.0"
+dependencies:
+	- name: hpa
+		version: 0.1.0
+		repository: "file://../../hpa"
