@@ -124,51 +124,6 @@ kubectl logs deployment/fluent-bit -n default | grep -A 2 "rewrite_tag"
 
 ---
 
-### Issue 4: Istio Integration
-
-**Context:**
-Your infrastructure uses Istio for service mesh networking.
-
-**Solution:**
-Fluentbit should work with Istio out of the box, but we provide an optional patch for Istio integration:
-
-```yaml
-# overlays/staging/istio/kustomization.yaml
-patchesJson6902:
-  - target:
-      group: apps
-      version: v1
-      kind: DaemonSet
-      name: fluent-bit
-    patch: |-
-      - op: add
-        path: /spec/template/metadata/labels/sidecar.istio.io~1inject
-        value: "false"
-```
-
-This prevents Istio from injecting a sidecar into Fluentbit pods (not needed for Fluentbit).
-
-**Alternative:** If you want Istio metrics for Fluentbit:
-
-```yaml
-# Keep sidecar enabled
-patchesJson6902:
-  - target:
-      group: apps
-      version: v1
-      kind: DaemonSet
-      name: fluent-bit
-    patch: |-
-      - op: add
-        path: /spec/template/metadata/annotations/prometheus.io~1scrape
-        value: "true"
-      - op: add
-        path: /spec/template/metadata/annotations/prometheus.io~1port
-        value: "2020"
-```
-
----
-
 ## Complete Deployment Flow
 
 ```
@@ -187,6 +142,7 @@ patchesJson6902:
    Reads values-shared.yaml
    Mounts ConfigMap volume
    Loads Lua script from ConfigMap
+   Disables Istio sidecar injection (system component)
    
 4. Log Processing
    ↓
@@ -201,6 +157,26 @@ patchesJson6902:
 
 ---
 
+## Istio Configuration
+
+Fluentbit is a system component and **does NOT require Istio sidecar injection**.
+
+**Patch Applied:** `overlays/staging/fluentbit-istio-patch.yaml`
+
+This disables Istio mesh injection for Fluentbit pods:
+
+```yaml
+metadata:
+  labels:
+    sidecar.istio.io/inject: "false"
+  annotations:
+    sidecar.istio.io/inject: "false"
+```
+
+Fluentbit continues to operate independently while other services use the service mesh.
+
+---
+
 ## Testing Checklist
 
 - [ ] ConfigMap created: `kubectl get cm fluentbit-lua-scripts -n default`
@@ -209,7 +185,7 @@ patchesJson6902:
 - [ ] Tags rewritten: `kubectl logs deployment/fluent-bit | grep service\\.*`
 - [ ] Indices created: `curl opensearch-host:9200/_cat/indices | grep logs-staging`
 - [ ] Logs routed: Query each index in OpenSearch
-- [ ] No Istio conflicts: `kubectl describe pod <fluentbit-pod> | grep -i istio`
+- [ ] No Istio sidecar: `kubectl get pod -n default -l app=fluent-bit -o json | jq '.items[0].spec.containers | length'` (should return 1)
 
 ---
 
@@ -246,6 +222,10 @@ kubectl apply -k overlays/staging
    - Lua script for service extraction
    - Mounted via ConfigMap
 
+4. **overlays/staging/fluentbit-istio-patch.yaml** (NEW)
+   - Patch to disable Istio sidecar injection
+   - Ensures system component runs independently
+
 ---
 
 ## Monitoring and Debugging
@@ -272,6 +252,13 @@ kubectl logs deployment/fluent-bit -n default | \
   grep -E "(rewrite_tag|service\\.)"
 ```
 
+### Verify Istio NOT Injected
+```bash
+kubectl get pod -n default -l app=fluent-bit -o json | \
+  jq '.items[0].spec.containers | length'
+```
+Should show `1` (just Fluentbit container, no Istio sidecar)
+
 ---
 
 ## Summary
@@ -279,5 +266,5 @@ kubectl logs deployment/fluent-bit -n default | \
 ✅ **Fixed:** Lua script now mounted via ConfigMap  
 ✅ **Fixed:** SERVICE variable replaced with FLUENTBIT_TAG_PART1  
 ✅ **Fixed:** Rewrite tag regex explicit and tested  
-✅ **Updated:** Istio compatibility documented  
+✅ **Fixed:** Istio sidecar disabled for system component  
 ✅ **Ready:** Full deployment with monitoring
