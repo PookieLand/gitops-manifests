@@ -1,14 +1,10 @@
 replicaCount: 1
-
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/employee-service
-  tag: ca9e4176
-
+  tag: 8486ec4e
 namespace: production
-
 service:
   nodePort: 30009
-
 secretRef: mysql-production
 hpa:
   enabled: true
