@@ -26,6 +26,9 @@ env:
   COMPLIANCE_SERVICE_URL: "http://compliance-service:80/api/v1"
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
 
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  REDIS_HOST: "redis:6379"
+
 secretRef: mysql-staging
 
 livenessProbe:

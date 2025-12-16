@@ -28,6 +28,10 @@ spec:
         - name: {{ $key }}
           value: "{{ $value }}"
         {{- end }}
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "{{ .Values.env.KAFKA_BOOTSTRAP_SERVERS | default \"kafka:9092\" }}"
+        - name: REDIS_HOST
+          value: "{{ .Values.env.REDIS_HOST | default \"redis:6379\" }}"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
