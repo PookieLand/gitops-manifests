@@ -77,15 +77,18 @@ fluent-bit:
           Copy                k8s_pod_name pod_name
           Copy                k8s_namespace_name namespace
           Copy                k8s_container_name container_name
-          Copy                k8s_labels service
 
-      # Derive service_name directly from service label
+      # Extract service name from pod_name using regex
+      # Pod naming: <service>-<replica_set>-<pod_hash>
+      # Extracts the service name prefix before first dash-number pattern
       [FILTER]
-          Name                modify
+          Name                parser
           Match               kube.*
-          Copy                service service_name
+          Key_Name            pod_name
+          Parser              service_name_extractor
+          Preserve_Key        On
 
-      # Rewrite tags based on service name - matching logs go to service.* output
+      # Rewrite tags based on known service names for routing to service-specific indices
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
@@ -139,6 +142,12 @@ fluent-bit:
           Generate_ID         On
           Replace_Dots        On
           Trace_Error         On
+
+  parsers: |
+    [PARSER]
+        Name                service_name_extractor
+        Format              regex
+        Regex               ^(?P<service_name>[a-z0-9]+-[a-z0-9]+)(?:-[a-z0-9]+){1,2}$
 
   env:
     - name: OPENSEARCH_PORT
