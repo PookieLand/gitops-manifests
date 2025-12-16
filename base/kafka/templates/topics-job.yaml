@@ -1,173 +1,95 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: kafka-topics-setup
+  name: kafka-topics-init
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "5"
-    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
       labels:
-        app: kafka-topics-setup
+        app: kafka-topics-init
     spec:
       restartPolicy: OnFailure
       containers:
-        - name: kafka-topics-setup
-          image: wurstmeister/kafka:2.13-2.8.1
-          command:
-            - /bin/bash
-            - -c
+        - name: kafka-topics-init
+          image: confluentinc/cp-kafka:7.6.0
+          command: ["/bin/sh", "-c"]
+          args:
             - |
-              set -e
-              
-              # Wait for Kafka to be ready
               echo "Waiting for Kafka to be ready..."
-              until kafka-topics.sh --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do
-                echo "Kafka not ready yet, waiting..."
-                sleep 5
-              done
-              echo "Kafka is ready!"
-              
-              # Function to create topic if it doesn't exist
-              create_topic() {
-                local topic_name=$1
-                local partitions=$2
-                local replication_factor=$3
-                local retention_ms=$4
-                if kafka-topics.sh --bootstrap-server kafka:9092 --list | grep -q "^${topic_name}$"; then
-                  echo "Topic ${topic_name} already exists, skipping..."
-                else
-                  echo "Creating topic: ${topic_name}"
-                  # Try to create, only ignore 'already exists' error, fail on others
-                  CREATE_OUTPUT=$(kafka-topics.sh --bootstrap-server kafka:9092 \
-                    --create \
-                    --topic "${topic_name}" \
-                    --partitions ${partitions} \
-                    --replication-factor ${replication_factor} \
-                    --config retention.ms=${retention_ms} \
-                    --config compression.type=lz4 \
-                    --config cleanup.policy=delete 2>&1)
-                  if echo "$CREATE_OUTPUT" | grep -q "Topic.*already exists"; then
-                    echo "Topic ${topic_name} already exists (race), skipping..."
-                  elif [ $? -eq 0 ]; then
-                    echo "✅ Created topic: ${topic_name}"
-                  else
-                    echo "❌ Failed to create topic: ${topic_name}"
-                    echo "$CREATE_OUTPUT"
-                    exit 1
-                  fi
-                fi
-              }
-              
-              echo "================================================"
-              echo "Creating Kafka Topics for HRMS"
-              echo "================================================"
-              
-              # Core Queue Topics
-              create_topic "notification-queue" 3 1 604800000
-              create_topic "audit-queue" 5 1 2592000000
-              create_topic "notification-dlq" 1 1 2592000000
-              create_topic "audit-dlq" 1 1 2592000000
-              
-              echo ""
-              echo "User Onboarding Topics"
-              echo "----------------------"
-              create_topic "user-onboarding-initiated" 3 1 604800000
-              create_topic "user-onboarding-asgardeo-created" 3 1 604800000
-              create_topic "user-onboarding-employee-created" 3 1 604800000
-              create_topic "user-onboarding-completed" 3 1 604800000
-              create_topic "user-onboarding-failed" 3 1 604800000
-              
-              echo ""
-              echo "User Event Topics"
-              echo "-----------------"
-              create_topic "user-created" 3 1 604800000
-              create_topic "user-updated" 3 1 604800000
-              create_topic "user-deleted" 3 1 604800000
-              create_topic "user-suspended" 3 1 604800000
-              create_topic "user-activated" 3 1 604800000
-              create_topic "user-role-changed" 3 1 604800000
-              
-              echo ""
-              echo "Employee Event Topics"
-              echo "---------------------"
-              create_topic "employee-created" 3 1 604800000
-              create_topic "employee-updated" 3 1 604800000
-              create_topic "employee-deleted" 3 1 604800000
-              create_topic "employee-terminated" 3 1 604800000
-              create_topic "employee-promoted" 3 1 604800000
-              create_topic "employee-transferred" 3 1 604800000
-              create_topic "employee-salary-updated" 2 1 604800000
-              create_topic "employee-salary-increment" 2 1 604800000
+              sleep 10
 
-              create_topic "employee-contract-ended" 2 1 604800000
-              create_topic "employee-contract-renewed" 2 1 604800000
-              create_topic "employee-contract-started" 2 1 604800000
-              create_topic "employee-department-changed" 2 1 604800000
-              create_topic "employee-manager-changed" 2 1 604800000
-              create_topic "employee-probation-completed" 2 1 604800000
-              create_topic "employee-probation-started" 2 1 604800000
-              create_topic "employee-team-changed" 2 1 604800000
-              
-              echo ""
-              echo "Attendance Event Topics"
-              echo "-----------------------"
-              create_topic "attendance-checkin" 5 1 604800000
-              create_topic "attendance-checkout" 5 1 604800000
-              create_topic "attendance-updated" 3 1 604800000
-              create_topic "attendance-late" 3 1 604800000
-              create_topic "attendance-absent" 3 1 604800000
+              echo "Creating Kafka topics for HRMS..."
 
-              # Additional Attendance Topics (from warnings)
-              create_topic "attendance-deleted" 3 1 604800000
-              create_topic "attendance-early-departure" 3 1 604800000
-              create_topic "attendance-overtime" 3 1 604800000
-              create_topic "attendance-short-leave" 3 1 604800000
-              
-              echo ""
-              echo "Leave Event Topics"
-              echo "------------------"
-              create_topic "leave-requested" 3 1 604800000
-              create_topic "leave-approved" 3 1 604800000
-              create_topic "leave-rejected" 3 1 604800000
-              create_topic "leave-cancelled" 3 1 604800000
+              # =========================
+              # User lifecycle events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-created --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-updated --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-deleted --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-suspended --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-activated --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-role-changed --partitions 3 --replication-factor 1
 
-              create_topic "leave-accrued" 2 1 604800000
-              create_topic "leave-balance-reset" 2 1 604800000
-              create_topic "leave-balance-updated" 2 1 604800000
-              create_topic "leave-ended" 2 1 604800000
-              create_topic "leave-extended" 2 1 604800000
-              create_topic "leave-modified" 2 1 604800000
-              create_topic "leave-revoked" 2 1 604800000
-              create_topic "leave-started" 2 1 604800000
-              
-              echo ""
-              echo "Notification Event Topics"
-              echo "-------------------------"
-              create_topic "notification-sent" 3 1 604800000
-              create_topic "notification-failed" 3 1 604800000
+              # =========================
+              # Onboarding events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-onboarding-initiated --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-onboarding-asgardeo-created --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-onboarding-employee-created --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-onboarding-completed --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic user-onboarding-failed --partitions 3 --replication-factor 1
 
-              create_topic "notification-delivered" 2 1 604800000
-              
-              echo ""
-              echo "Audit Action Topics"
-              echo "-------------------"
-              create_topic "audit-user-action" 3 1 2592000000
-              create_topic "audit-employee-action" 3 1 2592000000
-              create_topic "audit-attendance-action" 3 1 2592000000
-              create_topic "audit-leave-action" 3 1 2592000000
-              create_topic "audit-notification-action" 3 1 2592000000
-              create_topic "audit-compliance-action" 3 1 2592000000
-              
-              echo ""
-              echo "================================================"
-              echo "Kafka Topics Setup Complete!"
-              echo "================================================"
-              
-              # List all topics
-              echo ""
-              echo "Current Kafka Topics:"
-              kafka-topics.sh --bootstrap-server kafka:9092 --list
+              # =========================
+              # Special events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic employee-special-birthday --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic employee-special-work-anniversary --partitions 3 --replication-factor 1
+
+              # =========================
+              # HR events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-probation-ending --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-probation-ended --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-contract-expiring --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-contract-expired --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-performance-review-due --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-salary-increment-due --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-leave-balance-low --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic hr-excessive-leave --partitions 3 --replication-factor 1
+
+              # =========================
+              # Notification events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-welcome-email --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-invitation-email --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-password-set --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-sent --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-failed --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-delivered --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-late-arrival --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-absent-employee --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-overtime-alert --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-leave-pending --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-leave-approved --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-leave-rejected --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic notification-leave-reminder --partitions 3 --replication-factor 1
+
+              # =========================
+              # Audit events
+              # =========================
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-user-action --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-employee-action --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-attendance-action --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-leave-action --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-notification-action --partitions 3 --replication-factor 1
+              kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic audit-compliance-action --partitions 3 --replication-factor 1
+
+              echo "Listing all created topics:"
+              kafka-topics --bootstrap-server kafka:9092 --list
+
+              echo "Kafka topics created successfully!"
