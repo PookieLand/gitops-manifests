@@ -2,10 +2,6 @@ fluent-bit:
   backend:
     type: opensearch
 
-  # Let the upstream fluent-bit subchart render the [SERVICE] block
-  # (it expects a string at .Values.config.service). Provide the
-  # numeric/string values the chart uses instead of supplying a
-  # table for `.config.service` which causes the coalesce/type error.
   flush: 1
   logLevel: info
 
@@ -15,7 +11,7 @@ fluent-bit:
   rbac:
     create: true
 
-  # Container volume mounts for accessing host logs and Lua scripts
+  # Container volume mounts for accessing host logs
   volumeMounts:
     - name: varlog
       mountPath: /var/log
@@ -25,8 +21,6 @@ fluent-bit:
     - name: etcmachineid
       mountPath: /etc/machine-id
       readOnly: true
-    - name: lua-scripts
-      mountPath: /fluent-bit/scripts
 
   # DaemonSet volumes backing the container mounts
   daemonSetVolumes:
@@ -40,9 +34,6 @@ fluent-bit:
       hostPath:
         path: /etc/machine-id
         type: FileOrCreate
-    - name: lua-scripts
-      configMap:
-        name: fluentbit-lua-scripts
 
   config:
     inputs: |
@@ -88,13 +79,11 @@ fluent-bit:
           Copy                k8s_container_name container_name
           Copy                k8s_labels service
 
-      # Extract service name from pod name and labels
-      # This Lua script enriches logs with service_name field
+      # Derive service_name directly from service label, no Lua
       [FILTER]
-          Name                lua
+          Name                modify
           Match               kube.*
-          Script              /fluent-bit/scripts/extract_service.lua
-          Call                extract_service_from_pod
+          Copy                service service_name
 
       # Rewrite tags based on service name for routing to service-specific indices
       # Format: Match rule "{field} {regex}" "{output_tag}" {keep}
@@ -112,8 +101,7 @@ fluent-bit:
           Remove_prefix       k8s_
 
     outputs: |
-      # Service-specific output - routes logs to service-prefixed indices
-      # Uses Tag_Prefix pattern matching for service name extraction
+      # Service-specific output
       [OUTPUT]
           Name                opensearch
           Match               service.*
