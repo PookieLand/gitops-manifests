@@ -6,12 +6,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://charts.bitnami.com/bitnami'
-    chart: kafka
-    targetRevision: 28.1.0
+    repoURL: 'https://github.com/PookieLand/gitops-manifests.git'
+    targetRevision: main
+    path: base/services/kafka-chart
     helm:
       valueFiles:
-        - ../../base/services/kafka-service/values-staging.yaml
+        - values-staging.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: kafka-staging

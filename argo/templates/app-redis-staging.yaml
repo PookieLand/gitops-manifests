@@ -6,12 +6,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://charts.bitnami.com/bitnami'
-    chart: redis
-    targetRevision: 19.0.0
+    repoURL: 'https://github.com/PookieLand/gitops-manifests.git'
+    targetRevision: main
+    path: base/services/redis-chart
     helm:
       valueFiles:
-        - ../../base/services/redis-service/values-staging.yaml
+        - values-staging.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: redis-staging
