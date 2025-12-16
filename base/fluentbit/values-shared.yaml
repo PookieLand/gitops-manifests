@@ -62,6 +62,7 @@ fluent-bit:
           Labels              On
           Annotations         Off
 
+      # Lift kubernetes nested object to top level with k8s_ prefix
       [FILTER]
           Name                nest
           Match               kube.*
@@ -69,17 +70,24 @@ fluent-bit:
           Nested_under        kubernetes
           Add_prefix          k8s_
 
+      # Add environment and cluster info
       [FILTER]
           Name                modify
           Match               kube.*
           Add                 environment ${ENVIRONMENT}
           Add                 cluster ${CLUSTER_NAME}
+
+      # Extract service name from labels
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Copy                k8s_labels_app service_name
+          Copy                k8s_labels_tier tier
+          Copy                k8s_container_name container_name
           Copy                k8s_pod_name pod_name
           Copy                k8s_namespace_name namespace
-          Copy                k8s_container_name container_name
 
-      # Route by container_name pattern: known services have pod name matching their service
-      # Rewrite tags to separate service logs from system logs
+      # Route by container_name for service separation
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
@@ -91,6 +99,7 @@ fluent-bit:
           Rule                k8s_container_name notification-service service.notification-service true
           Rule                k8s_container_name user-service service.user-service true
 
+      # Nest all k8s fields under kubernetes object for clean structure
       [FILTER]
           Name                nest
           Match               kube.*
