@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/PookieLand/gitops-manifests.git
     targetRevision: main
-    path: overlays/staging/istio/networking
+    path: overlays/staging/istio
   destination:
     server: https://kubernetes.default.svc
     namespace: staging
