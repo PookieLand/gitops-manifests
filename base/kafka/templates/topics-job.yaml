@@ -94,6 +94,15 @@ spec:
               create_topic "employee-transferred" 3 1 604800000
               create_topic "employee-salary-updated" 2 1 604800000
               create_topic "employee-salary-increment" 2 1 604800000
+
+              create_topic "employee-contract-ended" 2 1 604800000
+              create_topic "employee-contract-renewed" 2 1 604800000
+              create_topic "employee-contract-started" 2 1 604800000
+              create_topic "employee-department-changed" 2 1 604800000
+              create_topic "employee-manager-changed" 2 1 604800000
+              create_topic "employee-probation-completed" 2 1 604800000
+              create_topic "employee-probation-started" 2 1 604800000
+              create_topic "employee-team-changed" 2 1 604800000
               
               echo ""
               echo "Attendance Event Topics"
@@ -103,6 +112,12 @@ spec:
               create_topic "attendance-updated" 3 1 604800000
               create_topic "attendance-late" 3 1 604800000
               create_topic "attendance-absent" 3 1 604800000
+
+              # Additional Attendance Topics (from warnings)
+              create_topic "attendance-deleted" 3 1 604800000
+              create_topic "attendance-early-departure" 3 1 604800000
+              create_topic "attendance-overtime" 3 1 604800000
+              create_topic "attendance-short-leave" 3 1 604800000
               
               echo ""
               echo "Leave Event Topics"
@@ -111,12 +126,23 @@ spec:
               create_topic "leave-approved" 3 1 604800000
               create_topic "leave-rejected" 3 1 604800000
               create_topic "leave-cancelled" 3 1 604800000
+
+              create_topic "leave-accrued" 2 1 604800000
+              create_topic "leave-balance-reset" 2 1 604800000
+              create_topic "leave-balance-updated" 2 1 604800000
+              create_topic "leave-ended" 2 1 604800000
+              create_topic "leave-extended" 2 1 604800000
+              create_topic "leave-modified" 2 1 604800000
+              create_topic "leave-revoked" 2 1 604800000
+              create_topic "leave-started" 2 1 604800000
               
               echo ""
               echo "Notification Event Topics"
               echo "-------------------------"
               create_topic "notification-sent" 3 1 604800000
               create_topic "notification-failed" 3 1 604800000
+
+              create_topic "notification-delivered" 2 1 604800000
               
               echo ""
               echo "Audit Action Topics"
