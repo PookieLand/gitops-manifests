@@ -20,3 +20,34 @@ helmCharts:
     namespace: logging
     valuesFiles:
       - values-shared.yaml
+    valuesInline:
+      fluent-bit:
+        # Volume mounts MUST be defined in valuesInline because the upstream
+        # Fluent Bit Helm chart does not expose volumeMounts and daemonSetVolumes
+        # as configurable options through values files.
+        # This is the ONLY way to mount host paths and the lua-scripts ConfigMap.
+        volumeMounts:
+          - name: varlog
+            mountPath: /var/log
+          - name: varlibdockercontainers
+            mountPath: /var/lib/docker/containers
+            readOnly: true
+          - name: etcmachineid
+            mountPath: /etc/machine-id
+            readOnly: true
+          - name: lua-scripts
+            mountPath: /fluent-bit/scripts
+        daemonSetVolumes:
+          - name: varlog
+            hostPath:
+              path: /var/log
+          - name: varlibdockercontainers
+            hostPath:
+              path: /var/lib/docker/containers
+          - name: etcmachineid
+            hostPath:
+              path: /etc/machine-id
+              type: FileOrCreate
+          - name: lua-scripts
+            configMap:
+              name: fluentbit-lua-scripts
