@@ -7,7 +7,7 @@ namespace: logging
 configMapGenerator:
   - name: fluentbit-lua-scripts
     files:
-      - scripts/extract_service.lua
+      - extract_service.lua=scripts/extract_service.lua
     options:
       disableNameSuffixHash: true
 
