@@ -18,20 +18,38 @@ resources:
 
 env:
   APP_NAME: "Employee Management Service"
+  APP_VERSION: "0.1.0"
+  DEBUG: "False"
+
+  # Database Configuration
+  DB_NAME: "hrms_db"
+
+  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-staging or mysql-production`.
+  # The Helm chart templates should be adjusted to read these values from the Secret
+  # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
+  # DB_USER: "user"
+  # DB_PASSWORD: "password"
+
   DB_HOST: "mysql"
   DB_PORT: "3306"
-  DB_NAME: "hrms_employees_db"
-  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
-  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
-  COMPLIANCE_SERVICE_URL: "http://compliance-service:80/api/v1"
-  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+  DB_CHARSET: "utf8"
+  # CORS Configuration (comma-separated list)
+  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080,http://localhost:8000"
+
+  # Asgardeo ORG
+  ASGARDEO_ORG: "pookieland"
+  ASGARDEO_CLIENT_ID: "VcwmDYW0_PKGIRtHwCcmEIDfeWUa"
 
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
   REDIS_HOST: "redis"
   REDIS_PORT: 6379
 
 
-secretRef: mysql-staging
+  # -------------------------------------------------
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
+  COMPLIANCE_SERVICE_URL: "http://compliance-service:80/api/v1"
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
 
 livenessProbe:
   path: /health
