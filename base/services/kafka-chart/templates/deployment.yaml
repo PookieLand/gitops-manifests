@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: kafka
-          image: bitnami/kafka:latest
+          image: wurstmeister/kafka:2.13-2.8.1
           ports:
             - containerPort: 9092
           resources:
