@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: default
+namespace: logging
 
 # Define resources
 resources: []
@@ -20,7 +20,7 @@ helmCharts:
     repo: https://fluent.github.io/helm-charts
     version: 0.53.0
     releaseName: fluent-bit
-    namespace: default
+    namespace: logging
     valuesFile: values-shared.yaml
     valuesInline:
       fluent-bit:
@@ -74,7 +74,7 @@ helmCharts:
             [FILTER]
                 Name                modify
                 Match               kube.*
-                Add                 environment staging
+                Add                 environment ${ENVIRONMENT}
                 Add                 cluster hrms-cluster
                 Copy                k8s_pod_name pod_name
                 Copy                k8s_namespace_name namespace
@@ -88,7 +88,7 @@ helmCharts:
             [FILTER]
                 Name                rewrite_tag
                 Match               kube.*
-                Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" false
+                Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" true
             [FILTER]
                 Name                nest
                 Match               kube.*
@@ -106,7 +106,7 @@ helmCharts:
                 Suppress_Type_Name  On
                 tls                 Off
                 Logstash_Format     On
-                Logstash_Prefix     logs-staging-${FLUENTBIT_TAG_PART1}
+                Logstash_Prefix     logs-${ENVIRONMENT}-${FLUENTBIT_TAG_PART1}
                 Logstash_DateFormat %Y.%m.%d
                 Time_Key            @timestamp
                 Generate_ID         On
@@ -121,7 +121,7 @@ helmCharts:
                 Suppress_Type_Name  On
                 tls                 Off
                 Logstash_Format     On
-                Logstash_Prefix     logs-staging-system
+                Logstash_Prefix     logs-${ENVIRONMENT}-system
                 Logstash_DateFormat %Y.%m.%d
                 Time_Key            @timestamp
                 Generate_ID         On
