@@ -21,6 +21,4 @@ env:
   AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
   NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
-
-  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-  REDIS_HOST: "redis:6379"
+  
