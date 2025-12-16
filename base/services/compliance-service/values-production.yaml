@@ -1,20 +1,12 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
-  tag: eb8ed726
+  tag: ed9dd073
 namespace: production
 service:
   nodePort: 30008
 envSecret:
   name: mysql-production
-hpa:
-  enabled: true
-  name: compliance-service-hpa
-  namespace: production
-  targetDeployment: compliance-service
-  minReplicas: 1
-  maxReplicas: 3
-  targetCPUUtilizationPercentage: 70
 
 env:
   KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-production:9092"
