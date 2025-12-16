@@ -1,12 +1,23 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
-  tag: 7494cada
+  tag: ed9dd073
 namespace: staging
 service:
   nodePort: 30006
 envSecret:
   name: mysql-staging
+hpa:
+  enabled: true
+  name: compliance-service-hpa
+  namespace: staging
+  targetDeployment: compliance-service
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-staging:9092"
 hpa:
   enabled: true
   name: compliance-service-hpa

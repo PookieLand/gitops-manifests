@@ -6,6 +6,10 @@ namespace: production
 service:
   nodePort: 30015
 secretRef: mysql-production
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-production:9092"
+
 hpa:
   enabled: true
   name: audit-service-hpa

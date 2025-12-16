@@ -2,7 +2,7 @@ namespace: staging
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/user-service
-  tag: b945bc51
+  tag: 33ac73ac
 service:
   nodePort: 30013
 hpa:
@@ -14,3 +14,6 @@ hpa:
   maxReplicas: 2
   targetCPUUtilizationPercentage: 60
 secretRef: mysql-staging
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-staging:9092"
