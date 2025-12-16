@@ -17,7 +17,7 @@ spec:
         - values-staging.yaml
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: staging
+    namespace: logging
   syncPolicy:
     automated:
       prune: true
