@@ -113,7 +113,7 @@ fluent-bit:
 
     outputs: |
       # Service-specific output - routes logs to service-prefixed indices
-      # Uses FLUENTBIT_TAG_PART1 (service name from rewritten tag)
+      # Uses Tag_Prefix pattern matching for service name extraction
       [OUTPUT]
           Name                opensearch
           Match               service.*
@@ -123,7 +123,7 @@ fluent-bit:
           Suppress_Type_Name  On
           tls                 Off
           Logstash_Format     On
-          Logstash_Prefix     logs-${ENVIRONMENT}-${FLUENTBIT_TAG_PART1}
+          Logstash_Prefix     logs-${ENVIRONMENT}-service
           Logstash_DateFormat %Y.%m.%d
           Time_Key            @timestamp
           Generate_ID         On
