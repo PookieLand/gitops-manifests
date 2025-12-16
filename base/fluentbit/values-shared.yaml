@@ -15,12 +15,31 @@ fluent-bit:
   rbac:
     create: true
 
-  # Mount the Lua script from ConfigMap
+  # Container volume mounts for accessing host logs and Lua scripts
   volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+    - name: varlibdockercontainers
+      mountPath: /var/lib/docker/containers
+      readOnly: true
+    - name: etcmachineid
+      mountPath: /etc/machine-id
+      readOnly: true
     - name: lua-scripts
       mountPath: /fluent-bit/scripts
 
+  # DaemonSet volumes backing the container mounts
   daemonSetVolumes:
+    - name: varlog
+      hostPath:
+        path: /var/log
+    - name: varlibdockercontainers
+      hostPath:
+        path: /var/lib/docker/containers
+    - name: etcmachineid
+      hostPath:
+        path: /etc/machine-id
+        type: FileOrCreate
     - name: lua-scripts
       configMap:
         name: fluentbit-lua-scripts
@@ -82,7 +101,7 @@ fluent-bit:
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
-          Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" false
+          Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" true
 
       [FILTER]
           Name                nest
