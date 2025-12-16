@@ -1,0 +1,139 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topics-setup
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: kafka-topics-setup
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-topics-setup
+          image: wurstmeister/kafka:2.13-2.8.1
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              
+              # Wait for Kafka to be ready
+              echo "Waiting for Kafka to be ready..."
+              until kafka-topics.sh --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do
+                echo "Kafka not ready yet, waiting..."
+                sleep 5
+              done
+              echo "Kafka is ready!"
+              
+              # Function to create topic if it doesn't exist
+              create_topic() {
+                local topic_name=$1
+                local partitions=$2
+                local replication_factor=$3
+                local retention_ms=$4
+                
+                if kafka-topics.sh --bootstrap-server kafka:9092 --list | grep -q "^${topic_name}$"; then
+                  echo "Topic ${topic_name} already exists, skipping..."
+                else
+                  echo "Creating topic: ${topic_name}"
+                  kafka-topics.sh --bootstrap-server kafka:9092 \
+                    --create \
+                    --topic "${topic_name}" \
+                    --partitions ${partitions} \
+                    --replication-factor ${replication_factor} \
+                    --config retention.ms=${retention_ms} \
+                    --config compression.type=lz4 \
+                    --config cleanup.policy=delete
+                  echo "✅ Created topic: ${topic_name}"
+                fi
+              }
+              
+              echo "================================================"
+              echo "Creating Kafka Topics for HRMS"
+              echo "================================================"
+              
+              # Core Queue Topics
+              create_topic "notification-queue" 3 1 604800000
+              create_topic "audit-queue" 5 1 2592000000
+              create_topic "notification-dlq" 1 1 2592000000
+              create_topic "audit-dlq" 1 1 2592000000
+              
+              echo ""
+              echo "User Onboarding Topics"
+              echo "----------------------"
+              create_topic "user-onboarding-initiated" 3 1 604800000
+              create_topic "user-onboarding-asgardeo-created" 3 1 604800000
+              create_topic "user-onboarding-employee-created" 3 1 604800000
+              create_topic "user-onboarding-completed" 3 1 604800000
+              create_topic "user-onboarding-failed" 3 1 604800000
+              
+              echo ""
+              echo "User Event Topics"
+              echo "-----------------"
+              create_topic "user-created" 3 1 604800000
+              create_topic "user-updated" 3 1 604800000
+              create_topic "user-deleted" 3 1 604800000
+              create_topic "user-suspended" 3 1 604800000
+              create_topic "user-activated" 3 1 604800000
+              create_topic "user-role-changed" 3 1 604800000
+              
+              echo ""
+              echo "Employee Event Topics"
+              echo "---------------------"
+              create_topic "employee-created" 3 1 604800000
+              create_topic "employee-updated" 3 1 604800000
+              create_topic "employee-deleted" 3 1 604800000
+              create_topic "employee-terminated" 3 1 604800000
+              create_topic "employee-promoted" 3 1 604800000
+              create_topic "employee-transferred" 3 1 604800000
+              create_topic "employee-salary-updated" 2 1 604800000
+              create_topic "employee-salary-increment" 2 1 604800000
+              
+              echo ""
+              echo "Attendance Event Topics"
+              echo "-----------------------"
+              create_topic "attendance-checkin" 5 1 604800000
+              create_topic "attendance-checkout" 5 1 604800000
+              create_topic "attendance-updated" 3 1 604800000
+              create_topic "attendance-late" 3 1 604800000
+              create_topic "attendance-absent" 3 1 604800000
+              
+              echo ""
+              echo "Leave Event Topics"
+              echo "------------------"
+              create_topic "leave-requested" 3 1 604800000
+              create_topic "leave-approved" 3 1 604800000
+              create_topic "leave-rejected" 3 1 604800000
+              create_topic "leave-cancelled" 3 1 604800000
+              
+              echo ""
+              echo "Notification Event Topics"
+              echo "-------------------------"
+              create_topic "notification-sent" 3 1 604800000
+              create_topic "notification-failed" 3 1 604800000
+              
+              echo ""
+              echo "Audit Action Topics"
+              echo "-------------------"
+              create_topic "audit-user-action" 3 1 2592000000
+              create_topic "audit-employee-action" 3 1 2592000000
+              create_topic "audit-attendance-action" 3 1 2592000000
+              create_topic "audit-leave-action" 3 1 2592000000
+              create_topic "audit-notification-action" 3 1 2592000000
+              create_topic "audit-compliance-action" 3 1 2592000000
+              
+              echo ""
+              echo "================================================"
+              echo "Kafka Topics Setup Complete!"
+              echo "================================================"
+              
+              # List all topics
+              echo ""
+              echo "Current Kafka Topics:"
+              kafka-topics.sh --bootstrap-server kafka:9092 --list
