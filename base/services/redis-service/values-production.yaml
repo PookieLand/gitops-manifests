@@ -12,3 +12,6 @@ master:
       memory: 512Mi
 service:
   type: ClusterIP
+image:
+  repository: ""
+  tag: ""
