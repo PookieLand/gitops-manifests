@@ -37,12 +37,27 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secretName | default "mysql-staging" }}
                   key: MYSQL_PASSWORD
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: SMTP-secrets
+                  key: SMTP_USER
+            - name: SMTP_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: SMTP-secrets
+                  key: SMTP_APP_PASSWORD
 {{- range $key, $value := .Values.env }}
-{{- if and (ne $key "DB_USER") (ne $key "DB_PASSWORD") }}
+{{- if and (ne $key "DB_USER") (ne $key "DB_PASSWORD") (ne $key "CORS_ORIGINS") }}
             - name: {{ $key }}
               value: "{{ $value }}"
 {{- end }}
 {{- end }}
+            - name: CORS_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: cors-secrets
+                  key: CORS_ORIGINS
           resources:
             requests:
               memory: "128Mi"

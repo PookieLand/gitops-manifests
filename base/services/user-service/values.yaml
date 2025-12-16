@@ -35,15 +35,17 @@ env:
   DB_PORT: "3306"
   DB_CHARSET: "utf8"
 
+  # CORS was configured via the in-cluster Secret `cors-secrets` for easy management.
+  # The Helm chart templates should be adjusted to read these values from the Secrets
   # CORS Configuration (comma-separated list)
-  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
+  # CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
 
   # Asgardeo ORG
   ASGARDEO_ORG: "pookieland"
   ASGARDEO_CLIENT_ID: "O1swhn0zfcjJGAfxIKIfuAyoApAa"
 
   # Do not set ASGARDEO_CLIENT_SECRET here.
-  # It is provided via the in-cluster Secret `user-service-secrets`.
+  # It is provided via the in-cluster Secret `asgardeo-secrets`.
   # ASGARDEO_CLIENT_SECRET: "DONT_PUT_IN_PLAINTEXT"
 
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"

@@ -31,7 +31,7 @@ env:
   DB_CHARSET: "utf8"
 
   # CORS Configuration (comma-separated list)
-  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
+  # CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
 
   # JWT/JWKS Settings
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"

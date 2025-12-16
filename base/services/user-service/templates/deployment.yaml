@@ -25,9 +25,16 @@ spec:
         - containerPort: 80
         env:
           {{- range $key, $value := .Values.env }}
+          {{- if ne $key "CORS_ORIGINS" }}
           - name: {{ $key }}
             value: "{{ $value }}"
           {{- end }}
+          {{- end }}
+          - name: CORS_ORIGINS
+            valueFrom:
+              secretKeyRef:
+                name: cors-secrets
+                key: CORS_ORIGINS
           - name: DB_USER
             valueFrom:
               secretKeyRef:
@@ -38,5 +45,10 @@ spec:
               secretKeyRef:
                 name: {{ .Values.secretRef }}
                 key: MYSQL_PASSWORD
+          - name: ASGARDEO_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: asgardeo-secrets
+                key: ASGARDEO_CLIENT_SECRET
         resources:
 {{- toYaml .Values.resources | nindent 10 }}
