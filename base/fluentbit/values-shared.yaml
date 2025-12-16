@@ -78,41 +78,18 @@ fluent-bit:
           Copy                k8s_namespace_name namespace
           Copy                k8s_container_name container_name
 
-      # Extract service name from pod_name using string manipulation
-      # Pod naming: <service>-<replica_set>-<pod_hash>
-      # Example: attendance-service-5994459d9-bgz42 -> attendance-service
-      # Strategy: split on dashes and take everything except last 2 parts
-      [FILTER]
-          Name                nest
-          Match               kube.*
-          Operation           lift
-          Nested_under        pod_name
-          Add_prefix          pod_
-
-      # Use grep to check if pod_name matches known services
-      # If it matches a service name, set service_name field
-      [FILTER]
-          Name                grep
-          Match               kube.*
-          Regex               pod_name (attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)
-
-      # For matching pods, extract the service name via modify + key/value
-      [FILTER]
-          Name                record_modifier
-          Match               kube.*
-          Record              service_name ${pod_name}
-
-      # Rewrite tags based on known service names for routing to service-specific indices
+      # Route by container_name pattern: known services have pod name matching their service
+      # Rewrite tags to separate service logs from system logs
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
-          Rule                pod_name attendance-service service.attendance-service true
-          Rule                pod_name audit-service service.audit-service true
-          Rule                pod_name compliance-service service.compliance-service true
-          Rule                pod_name employee-service service.employee-service true
-          Rule                pod_name leave-service service.leave-service true
-          Rule                pod_name notification-service service.notification-service true
-          Rule                pod_name user-service service.user-service true
+          Rule                k8s_container_name attendance-service service.attendance-service true
+          Rule                k8s_container_name audit-service service.audit-service true
+          Rule                k8s_container_name compliance-service service.compliance-service true
+          Rule                k8s_container_name employee-service service.employee-service true
+          Rule                k8s_container_name leave-service service.leave-service true
+          Rule                k8s_container_name notification-service service.notification-service true
+          Rule                k8s_container_name user-service service.user-service true
 
       [FILTER]
           Name                nest
