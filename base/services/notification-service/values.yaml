@@ -43,7 +43,7 @@ env:
   DB_CHARSET: "utf8"
 
   # CORS Settings
-  CORS_ORIGINS: "https://localhost,http://localhost:3000"
+  # CORS_ORIGINS: "https://localhost,http://localhost:3000"
   CORS_ALLOW_CREDENTIALS: "true"
   # Asgardeo ORG
   ASGARDEO_ORG: "pookieland"
@@ -58,7 +58,7 @@ env:
   SMTP_PORT: "465"
 
   # DO NOT set SMTP_USER and SMTP_APP_PASSWORD here.
-  # These are provided via the in-cluster Secret `notification-service-secrets`.
+  # These are provided via the in-cluster Secret `smtp-secrets`.
   # The Helm chart templates should be adjusted to read these values from the Secret
   # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
   # SMTP_USER: "notifytothismail@example.com"

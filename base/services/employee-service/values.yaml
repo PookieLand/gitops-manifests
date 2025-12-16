@@ -34,7 +34,7 @@ env:
   DB_PORT: "3306"
   DB_CHARSET: "utf8"
   # CORS Configuration (comma-separated list)
-  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080,http://localhost:8000"
+  # CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080,http://localhost:8000"
 
   # Asgardeo ORG
   ASGARDEO_ORG: "pookieland"

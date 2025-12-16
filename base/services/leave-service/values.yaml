@@ -27,7 +27,7 @@ env:
   DB_CHARSET: "utf8"
 
   # CORS Configuration (comma-separated list)
-  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
+  # CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
 
   # Asgardeo ORG
   ASGARDEO_ORG: "pookieland"
