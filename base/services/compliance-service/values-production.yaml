@@ -15,3 +15,14 @@ hpa:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 70
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-production:9092"
+hpa:
+  enabled: true
+  name: compliance-service-hpa
+  namespace: production
+  targetDeployment: compliance-service
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70

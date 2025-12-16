@@ -18,3 +18,6 @@ hpa:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 70
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.kafka-production:9092"
