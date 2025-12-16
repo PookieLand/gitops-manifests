@@ -24,5 +24,7 @@ env:
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
 
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-  REDIS_HOST: "redis:6379"
+  REDIS_HOST: "redis"
+  REDIS_PORT: 6379
+
 
