@@ -32,9 +32,9 @@ spec:
               value: "{{ $value }}"
             {{- end }}
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "{{ .Values.env.KAFKA_BOOTSTRAP_SERVERS | default \"kafka:9092\" }}"
+              value: "{{ .Values.env.KAFKA_BOOTSTRAP_SERVERS }}"
             - name: REDIS_HOST
-              value: "{{ .Values.env.REDIS_HOST | default \"redis:6379\" }}"
+              value: "{{ .Values.env.REDIS_HOST }}"
             {{- if .Values.envSecret.name }}
             - name: DB_USER
               valueFrom:
