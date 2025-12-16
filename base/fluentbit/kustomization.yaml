@@ -3,8 +3,9 @@ kind: Kustomization
 
 namespace: logging
 
-# Define resources
-resources: []
+# Define resources to deploy
+resources:
+  - opensearch-secret.yaml
 
 # Create ConfigMap from Lua script
 configMapGenerator:
