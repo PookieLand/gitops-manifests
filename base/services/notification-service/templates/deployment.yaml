@@ -41,12 +41,17 @@ spec:
 {{- if and (ne $key "DB_USER") (ne $key "DB_PASSWORD") }}
             - name: {{ $key }}
               value: "{{ $value }}"
-{{- end }}
-{{- end }}
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
+                {{- range $key, $value := .Values.env }}
+                - name: {{ $key }}
+                  value: "{{ $value }}"
+                {{- end }}
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.envSecretName }}
+                      key: {{ .Values.mysqlUserKey }}
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.envSecretName }}
+                      key: {{ .Values.mysqlPasswordKey }}

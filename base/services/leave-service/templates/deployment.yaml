@@ -18,30 +18,8 @@ spec:
       imagePullSecrets:
         - name: ecr-registry-secret
       containers:
-      - name: leave-service
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - containerPort: 80
-        env:
         {{- range $key, $value := .Values.env }}
         - name: {{ $key }}
           value: "{{ $value }}"
         {{- end }}
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.mysqlSecretName }}
-              key: {{ .Values.mysqlUserKey }}
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.mysqlSecretName }}
-              key: {{ .Values.mysqlPasswordKey }}
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
+        - containerPort: 80

@@ -24,14 +24,10 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: APP_NAME
-          value: "{{ .Values.env.APP_NAME }}"
-        - name: DB_HOST
-          value: "{{ .Values.env.DB_HOST }}"
-        - name: DB_PORT
-          value: "{{ .Values.env.DB_PORT }}"
-        - name: DB_NAME
-          value: "{{ .Values.env.DB_NAME }}"
+        {{- range $key, $value := .Values.env }}
+        - name: {{ $key }}
+          value: "{{ $value }}"
+        {{- end }}
         - name: DB_USER
           valueFrom:
             secretKeyRef:
@@ -42,14 +38,6 @@ spec:
             secretKeyRef:
               name: {{ .Values.secretRef }}
               key: MYSQL_PASSWORD
-        - name: AUDIT_SERVICE_URL
-          value: "{{ .Values.env.AUDIT_SERVICE_URL }}"
-        - name: NOTIFICATION_SERVICE_URL
-          value: "{{ .Values.env.NOTIFICATION_SERVICE_URL }}"
-        - name: COMPLIANCE_SERVICE_URL
-          value: "{{ .Values.env.COMPLIANCE_SERVICE_URL }}"
-        - name: JWKS_URL
-          value: "{{ .Values.env.JWKS_URL }}"
         livenessProbe:
           httpGet:
             path: {{ .Values.livenessProbe.path }}
