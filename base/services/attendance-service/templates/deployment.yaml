@@ -32,10 +32,6 @@ spec:
           value: "{{ .Values.env.DB_PORT }}"
         - name: DB_NAME
           value: "{{ .Values.env.DB_NAME }}"
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "{{ .Values.env.KAFKA_BOOTSTRAP_SERVERS }}"
-        - name: REDIS_HOST
-          value: "{{ .Values.env.REDIS_HOST }}"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
