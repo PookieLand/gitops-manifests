@@ -77,7 +77,15 @@ fluent-bit:
           Add                 environment ${ENVIRONMENT}
           Add                 cluster ${CLUSTER_NAME}
 
-      # Extract service name from labels
+      # Extract log level from log message using regex
+      # Matches: ERROR, WARN, WARNING, INFO, DEBUG, CRITICAL, TRACE, etc.
+      [FILTER]
+          Name                regex
+          Match               kube.*
+          Regex               log \b(ERROR|WARN|WARNING|INFO|DEBUG|CRITICAL|TRACE|FATAL|PANIC|NOTICE|SUCCESS|FAIL|FAILURE)\b
+          Add                 log_level $log_level
+
+      # Extract service name from labels and add common fields
       [FILTER]
           Name                modify
           Match               kube.*
@@ -86,6 +94,13 @@ fluent-bit:
           Copy                k8s_container_name container_name
           Copy                k8s_pod_name pod_name
           Copy                k8s_namespace_name namespace
+
+      # Set default log level if not extracted
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Key_Does_Not_Exist log_level
+          Add                 log_level INFO
 
       # Route by container_name for service separation
       [FILTER]
