@@ -8,13 +8,13 @@ spec:
   source:
     repoURL: 'https://github.com/PookieLand/gitops-manifests.git'
     targetRevision: main
-    path: base/services/redis-chart
+    path: base/redis
     helm:
       valueFiles:
         - values-production.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: redis-production
+    namespace: production
   syncPolicy:
     automated:
       prune: true

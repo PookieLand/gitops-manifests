@@ -1,16 +1,13 @@
 replicaCount: 1
 
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
+master:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
 service:
   type: ClusterIP
-
-persistence:
-  enabled: true
-  size: 5Gi
