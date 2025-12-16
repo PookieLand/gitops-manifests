@@ -3,14 +3,6 @@ kind: Kustomization
 
 namespace: logging
 
-# Create ConfigMap from Lua script
-configMapGenerator:
-  - name: fluentbit-lua-scripts
-    files:
-      - extract_service.lua=scripts/extract_service.lua
-    options:
-      disableNameSuffixHash: true
-
 # Helm chart dependency
 helmCharts:
   - name: fluentbit
@@ -22,10 +14,7 @@ helmCharts:
       - values-shared.yaml
     valuesInline:
       fluent-bit:
-        # Volume mounts MUST be defined in valuesInline because the upstream
-        # Fluent Bit Helm chart does not expose volumeMounts and daemonSetVolumes
-        # as configurable options through values files.
-        # This is the ONLY way to mount host paths and the lua-scripts ConfigMap.
+        # Volume mounts for log collection
         volumeMounts:
           - name: varlog
             mountPath: /var/log
@@ -35,8 +24,6 @@ helmCharts:
           - name: etcmachineid
             mountPath: /etc/machine-id
             readOnly: true
-          - name: lua-scripts
-            mountPath: /fluent-bit/scripts
         daemonSetVolumes:
           - name: varlog
             hostPath:
@@ -48,6 +35,3 @@ helmCharts:
             hostPath:
               path: /etc/machine-id
               type: FileOrCreate
-          - name: lua-scripts
-            configMap:
-              name: fluentbit-lua-scripts
