@@ -77,13 +77,43 @@ fluent-bit:
           Add                 environment ${ENVIRONMENT}
           Add                 cluster ${CLUSTER_NAME}
 
-      # Extract log level from log message using regex
-      # Matches: ERROR, WARN, WARNING, INFO, DEBUG, CRITICAL, TRACE, etc.
+      # Detect log level from message: ERROR, WARN, WARNING, INFO, DEBUG
       [FILTER]
-          Name                regex
+          Name                modify
           Match               kube.*
-          Regex               log \b(ERROR|WARN|WARNING|INFO|DEBUG|CRITICAL|TRACE|FATAL|PANIC|NOTICE|SUCCESS|FAIL|FAILURE)\b
-          Add                 log_level $log_level
+          Condition           Regex log ERROR
+          Add                 log_level ERROR
+
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Regex log (WARN|WARNING)
+          Add                 log_level WARN
+
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Regex log DEBUG
+          Add                 log_level DEBUG
+
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Regex log CRITICAL
+          Add                 log_level CRITICAL
+
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Regex log FATAL
+          Add                 log_level FATAL
+
+      # Default to INFO if no level detected
+      [FILTER]
+          Name                modify
+          Match               kube.*
+          Condition           Key_Does_Not_Exist log_level
+          Add                 log_level INFO
 
       # Extract service name from labels and add common fields
       [FILTER]
@@ -94,13 +124,6 @@ fluent-bit:
           Copy                k8s_container_name container_name
           Copy                k8s_pod_name pod_name
           Copy                k8s_namespace_name namespace
-
-      # Set default log level if not extracted
-      [FILTER]
-          Name                modify
-          Match               kube.*
-          Condition           Key_Does_Not_Exist log_level
-          Add                 log_level INFO
 
       # Route by container_name for service separation
       [FILTER]
