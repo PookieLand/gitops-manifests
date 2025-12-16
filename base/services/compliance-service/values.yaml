@@ -11,17 +11,35 @@ service:
   targetPort: 8000
 
 env:
+  # Application Settings
   APP_NAME: "Compliance Service"
-  DB_HOST: "mysql"
-  DB_PORT: "3306"
-  DB_NAME: "hrms_compliance_db"
+  APP_VERSION: "1.0.0"
+  DEBUG: "False"
+
+
+  # Database Configuration
+  DB_NAME: "hrms_db"
+
   # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-staging or mysql-production`.
   # The Helm chart templates should be adjusted to read these values from the Secret
   # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
-  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
-  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
-  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+  # DB_USER: "user"
+  # DB_PASSWORD: "password"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_CHARSET: "utf8"
 
+  # CORS Configuration (comma-separated list)
+  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
+
+  # JWT/JWKS Settings
+  JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
+  
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
   REDIS_HOST: "redis"
   REDIS_PORT: 6379
+
+  # -------------------------------------------------
+  AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:80/api/v1"
+

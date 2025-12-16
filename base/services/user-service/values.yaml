@@ -21,16 +21,40 @@ resources:
 
 env:
   APP_NAME: "User Management Service"
+  APP_VERSION: "1.0.0"
+  DEBUG: "False"
+
+  # Database Configuration
+  DB_NAME: "hrms_db"
+
+  # Do not set DB_USER and DB_PASSWORD here.
+  # use mysql secrets
+  # DB_USER: "user"
+  # DB_PASSWORD: "password"
   DB_HOST: "mysql"
   DB_PORT: "3306"
-  DB_NAME: "hrms_users_db"
+  DB_CHARSET: "utf8"
+
+  # CORS Configuration (comma-separated list)
+  CORS_ORIGINS: "https://localhost,http://localhost:3000,http://localhost:8080"
+
+  # Asgardeo ORG
+  ASGARDEO_ORG: "pookieland"
+  ASGARDEO_CLIENT_ID: "O1swhn0zfcjJGAfxIKIfuAyoApAa"
+
+  # Do not set ASGARDEO_CLIENT_SECRET here.
+  # It is provided via the in-cluster Secret `user-service-secrets`.
+  # ASGARDEO_CLIENT_SECRET: "DONT_PUT_IN_PLAINTEXT"
+
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  REDIS_HOST: "redis"
+  REDIS_PORT: 6379
+
+# -------------------------------------------------------
+
   DB_USER_SECRET: "mysql-staging"
   DB_USER_KEY: "MYSQL_USER"
   DB_PASSWORD_SECRET: "mysql-staging"
   DB_PASSWORD_KEY: "MYSQL_PASSWORD"
   AUDIT_SERVICE_URL: "http://audit-service:80/api/v1"
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
-
-  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-  REDIS_HOST: "redis"
-  REDIS_PORT: 6379

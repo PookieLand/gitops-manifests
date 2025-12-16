@@ -17,12 +17,90 @@ env:
   APP_NAME: "Notification Service"
   DB_HOST: "mysql"
   DB_PORT: "3306"
-  DB_NAME: "hrms_notifications_db"
-  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-credentials`.
-  # The Helm chart templates should be adjusted to read these values from the Secret
-  # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
+  DB_NAME: "hrms_db"
+
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
 
   KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
   REDIS_HOST: "redis"
   REDIS_PORT: 6379
+
+  # Application Settings
+  APP_NAME: "Notification Service"
+  APP_VERSION: "0.1.0"
+  DEBUG: "False"
+
+  # Database Settings
+  DB_NAME: "hrms_db"
+
+  # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-credentials`.
+  # The Helm chart templates should be adjusted to read these values from the Secret
+  # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
+  # DB_USER: "user"
+  # DB_PASSWORD: "password"
+  DB_HOST: "localhost"
+  DB_PORT: "3306"
+  DB_CHARSET: "utf8"
+
+  # CORS Settings
+  CORS_ORIGINS: "https://localhost,http://localhost:3000"
+  CORS_ALLOW_CREDENTIALS: "true"
+  # Asgardeo ORG
+  ASGARDEO_ORG: "pookieland"
+  ASGARDEO_CLIENT_ID: "VcwmDYW0_PKGIRtHwCcmEIDfeWUa"
+
+  # Logging
+  # LOG_LEVEL=INFO
+
+  # Email Settings (SMTP Configuration)
+  # For Gmail: Use App Password (https://myaccount.google.com/apppasswords)
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "465"
+
+  # DO NOT set SMTP_USER and SMTP_APP_PASSWORD here.
+  # These are provided via the in-cluster Secret `notification-service-secrets`.
+  # The Helm chart templates should be adjusted to read these values from the Secret
+  # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
+  # SMTP_USER: "notifytothismail@example.com"
+  # SMTP_APP_PASSWORD: "paassword"
+  SMTP_USE_TLS: "True"
+  EMAIL_SERVICE_NAME: "HRMS"
+
+  # Notification Settings
+  MAX_RETRIES: 3
+  RETRY_DELAY_SECONDS: 300
+
+  # number of retries on primary provider before falling back
+  FALLBACK_RETRY_COUNT: 2
+  # Enable automatic fallback to secondary provider on primary failure
+  ENABLE_FALLBACK: true
+
+  # Enable/disable SMTP provider
+  SMTP_ENABLED: true
+
+  # AWS Credentials (leave empty if using IAM roles/IRSA in Kubernetes)
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+
+  # Verified sender email address in SES (required for SES)
+  # Must be verified in SES console or via domain verification
+  SES_SENDER_EMAIL: "noreply@yourdomain.com"
+
+  # Optional: SES Configuration Set for tracking metrics
+  SES_CONFIGURATION_SET: ""
+
+  # Enable/disable SES provider
+  SES_ENABLED: true
+
+  # Options: "ses", "smtp", "hybrid"
+  # - ses: Use only Amazon SES
+  # - smtp: Use only Gmail SMTP (legacy behavior)
+  # - hybrid: Use SES as primary with SMTP as fallback (recommended for production)
+  EMAIL_PROVIDER: "smtp"
+
+  # AWS Region where SES is configured
+  AWS_REGION: "us-east-1"
+
+  # Optional: Override JWT settings if needed
+  # JWT_AUDIENCE: ""
+  # JWT_ISSUER: ""
