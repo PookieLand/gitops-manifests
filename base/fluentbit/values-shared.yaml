@@ -79,18 +79,23 @@ fluent-bit:
           Copy                k8s_container_name container_name
           Copy                k8s_labels service
 
-      # Derive service_name directly from service label, no Lua
+      # Derive service_name directly from service label
       [FILTER]
           Name                modify
           Match               kube.*
           Copy                service service_name
 
-      # Rewrite tags based on service name for routing to service-specific indices
-      # Format: Match rule "{field} {regex}" "{output_tag}" {keep}
+      # Rewrite tags based on service name - matching logs go to service.* output
       [FILTER]
           Name                rewrite_tag
           Match               kube.*
-          Rule                "service_name ^(attendance-service|audit-service|compliance-service|employee-service|leave-service|notification-service|user-service)$" "service.$1" true
+          Rule                service_name attendance-service service.attendance-service true
+          Rule                service_name audit-service service.audit-service true
+          Rule                service_name compliance-service service.compliance-service true
+          Rule                service_name employee-service service.employee-service true
+          Rule                service_name leave-service service.leave-service true
+          Rule                service_name notification-service service.notification-service true
+          Rule                service_name user-service service.user-service true
 
       [FILTER]
           Name                nest
