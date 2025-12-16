@@ -6,7 +6,7 @@ metadata:
   name: fluent-bit-production
   namespace: {{ .Values.metadata.namespace }}
 spec:
-  project: hrms-production
+  project: hrms-prod
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
@@ -17,7 +17,7 @@ spec:
         - values-production.yaml
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: production
+    namespace: logging
   syncPolicy:
     automated:
       prune: true
