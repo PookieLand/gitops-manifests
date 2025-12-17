@@ -2,6 +2,8 @@ apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: kafka
+  annotations:
+    strimzi.io/node-pools: "enabled"
 spec:
   kafka:
     version: 4.1.1
