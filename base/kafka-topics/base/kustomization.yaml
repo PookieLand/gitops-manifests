@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - topics/topics.yaml
+commonLabels:
+  topic-set: core
+  strimzi.io/cluster: kafka
+patches:
+  - target:
+      group: kafka.strimzi.io
+      version: v1
+      kind: KafkaTopic
+      labelSelector: topic-set=core
+    path: defaults-topic-patch.yaml

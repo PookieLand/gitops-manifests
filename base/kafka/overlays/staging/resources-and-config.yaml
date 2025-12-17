@@ -1,0 +1,17 @@
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: kafka
+spec:
+  kafka:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+    config:
+      log.retention.hours: 168
+      log.segment.bytes: 1073741824
+      log.cleanup.policy: delete
