@@ -3,15 +3,14 @@ kind: Application
 metadata:
   name: kafka-staging
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   project: default
   source:
     repoURL: 'https://github.com/PookieLand/gitops-manifests.git'
     targetRevision: main
-    path: base/kafka
-    helm:
-      valueFiles:
-        - values-staging.yaml
+    path: base/kafka/overlays/staging
   destination:
     server: https://kubernetes.default.svc
     namespace: staging
@@ -21,3 +20,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
