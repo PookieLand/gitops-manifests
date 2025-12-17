@@ -4,12 +4,18 @@ metadata:
   name: kafkathree-init-topics
   labels:
     app: kafkathree-topics-init
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
 spec:
   backoffLimit: 3
+  ttlSecondsAfterFinished: 120
   template:
     metadata:
       labels:
         app: kafkathree-topics-init
+      annotations:
+        sidecar.istio.io/inject: "true"
+        proxy.istio.io/config: '{"terminationDrainDuration":"1s","drainDuration":"1s"}'
     spec:
       restartPolicy: OnFailure
       containers:
