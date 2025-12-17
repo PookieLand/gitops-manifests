@@ -15,3 +15,9 @@ patches:
       version: v1
       kind: KafkaNodePool
       name: dual-role
+  - path: nodepool-resources.yaml
+    target:
+      group: kafka.strimzi.io
+      version: v1
+      kind: KafkaNodePool
+      name: dual-role
