@@ -6,7 +6,7 @@ metadata:
   name: fluent-bit-production
   namespace: {{ .Values.metadata.namespace }}
 spec:
-  project: hrms-prod
+  project: hrms-production
   source:
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
