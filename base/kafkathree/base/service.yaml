@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafkathree
+  labels:
+    app: kafkathree
+spec:
+  type: ClusterIP
+  selector:
+    app: kafkathree
+  ports:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+    - name: internal
+      port: 29092
+      targetPort: 29092
+    - name: controller
+      port: 9093
+      targetPort: 9093

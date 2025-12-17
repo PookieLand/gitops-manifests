@@ -1,0 +1,119 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafkathree-init-topics
+  labels:
+    app: kafkathree
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: kafkathree
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-init
+          image: confluentinc/cp-kafka:7.6.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh","-c"]
+          args:
+            - |
+              echo "Waiting for Kafka to be ready...";
+              for i in $(seq 1 30); do
+                kafka-topics --bootstrap-server kafkathree:29092 --list >/dev/null 2>&1 && break;
+                echo "Kafka not ready yet, retry $i...";
+                sleep 10;
+              done;
+              echo "Creating Kafka topics for HRMS...";
+              create() { kafka-topics --bootstrap-server kafkathree:29092 --create --if-not-exists --topic "$1" --partitions 3 --replication-factor 1; };
+              # User lifecycle events
+              create user-created;
+              create user-updated;
+              create user-deleted;
+              create user-suspended;
+              create user-activated;
+              create user-role-changed;
+              # Onboarding events
+              create user-onboarding-initiated;
+              create user-onboarding-asgardeo-created;
+              create user-onboarding-employee-created;
+              create user-onboarding-completed;
+              create user-onboarding-failed;
+              # Special events
+              create employee-special-birthday;
+              create employee-special-work-anniversary;
+              # HR events
+              create hr-probation-ending;
+              create hr-probation-ended;
+              create hr-contract-expiring;
+              create hr-contract-expired;
+              create hr-performance-review-due;
+              create hr-salary-increment-due;
+              create hr-leave-balance-low;
+              create hr-excessive-leave;
+              # Notification events
+              create notification-welcome-email;
+              create notification-invitation-email;
+              create notification-password-set;
+              create notification-sent;
+              create notification-failed;
+              create notification-delivered;
+              create notification-late-arrival;
+              create notification-absent-employee;
+              create notification-overtime-alert;
+              create notification-leave-pending;
+              create notification-leave-approved;
+              create notification-leave-rejected;
+              create notification-leave-reminder;
+              # Audit events
+              create audit-user-action;
+              create audit-employee-action;
+              create audit-attendance-action;
+              create audit-leave-action;
+              create audit-notification-action;
+              create audit-compliance-action;
+              # Employee events
+              create employee-created;
+              create employee-updated;
+              create employee-deleted;
+              create employee-terminated;
+              create employee-promoted;
+              create employee-transferred;
+              create employee-salary-updated;
+              create employee-salary-increment;
+              create employee-contract-started;
+              create employee-contract-renewed;
+              create employee-contract-ended;
+              create employee-probation-started;
+              create employee-probation-completed;
+              # Attendance events
+              create attendance-checkin;
+              create attendance-checkout;
+              create attendance-updated;
+              create attendance-late;
+              create attendance-absent;
+              create attendance-overtime;
+              # Leave events
+              create leave-requested;
+              create leave-approved;
+              create leave-rejected;
+              create leave-cancelled;
+              create leave-started;
+              create leave-ended;
+              # Compliance events
+              create compliance-data-inventory-updated;
+              create compliance-data-category-created;
+              create compliance-data-category-updated;
+              create compliance-retention-check;
+              create compliance-retention-warning;
+              create compliance-data-expired;
+              create compliance-data-deleted;
+              create compliance-data-access-request;
+              create compliance-data-deletion-request;
+              create compliance-data-export-request;
+              create compliance-access-granted;
+              create compliance-access-revoked;
+              echo "Listing all created topics:";
+              kafka-topics --bootstrap-server kafkathree:29092 --list;
+              echo "Kafka topics created successfully!";
