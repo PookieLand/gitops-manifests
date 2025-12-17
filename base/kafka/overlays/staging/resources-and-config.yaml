@@ -4,13 +4,15 @@ metadata:
   name: kafka
 spec:
   kafka:
-    resources:
-      requests:
-        cpu: "500m"
-        memory: "1Gi"
-      limits:
-        cpu: "1000m"
-        memory: "2Gi"
+    template:
+      pod:
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
     config:
       log.retention.hours: 168
       log.segment.bytes: 1073741824
