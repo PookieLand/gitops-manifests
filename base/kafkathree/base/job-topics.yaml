@@ -126,6 +126,8 @@ spec:
               echo "Listing all created topics:";
               kafka-topics --bootstrap-server kafkathree:29092 --list;
               echo "Kafka topics created successfully!";
+              echo "Requesting istio-proxy to quit (15020/quitquitquit)...";
+              curl -fsS -X POST http://127.0.0.1:15020/quitquitquit || true;
 
               # --- ADDED: Tell Istio to exit so Job can finish ---
               curl -X POST http://localhost:15020/quitquit

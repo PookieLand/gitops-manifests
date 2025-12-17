@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafkathree-staging
+  name: kafkathree-production
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  project: hrms-staging
+  project: hrms-production
   source:
     repoURL: 'https://github.com/PookieLand/gitops-manifests.git'
     targetRevision: main
-    path: base/kafkathree/overlays/staging
+    path: base/kafkathree/overlays/production
   destination:
     server: https://kubernetes.default.svc
-    namespace: staging
+    namespace: production
   syncPolicy:
     automated:
       prune: true
