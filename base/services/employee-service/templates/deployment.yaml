@@ -45,17 +45,54 @@ spec:
               secretKeyRef:
                 name: {{ .Values.secretRef }}
                 key: MYSQL_PASSWORD
+        {{- with .Values.livenessProbe }}
         livenessProbe:
+          {{- if or (not .type) (eq .type "http") }}
           httpGet:
-            path: {{ .Values.livenessProbe.path }}
-            port: {{ .Values.livenessProbe.port }}
-          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            path: {{ .path }}
+            port: {{ .port }}
+          {{- else if eq .type "tcp" }}
+          tcpSocket:
+            port: {{ .port }}
+          {{- end }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          {{- if .timeoutSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- if .failureThreshold }}
+          failureThreshold: {{ .failureThreshold }}
+          {{- end }}
+        {{- end }}
+        {{- with .Values.readinessProbe }}
         readinessProbe:
+          {{- if or (not .type) (eq .type "http") }}
           httpGet:
-            path: {{ .Values.readinessProbe.path }}
-            port: {{ .Values.readinessProbe.port }}
-          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            path: {{ .path }}
+            port: {{ .port }}
+          {{- else if eq .type "tcp" }}
+          tcpSocket:
+            port: {{ .port }}
+          {{- end }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          {{- if .timeoutSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- if .failureThreshold }}
+          failureThreshold: {{ .failureThreshold }}
+          {{- end }}
+        {{- end }}
+        {{- with .Values.startupProbe }}
+        startupProbe:
+          httpGet:
+            path: {{ .path }}
+            port: {{ .port }}
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          {{- if .failureThreshold }}
+          failureThreshold: {{ .failureThreshold }}
+          {{- end }}
+        {{- end }}
         resources:
 {{- toYaml .Values.resources | nindent 10 }}

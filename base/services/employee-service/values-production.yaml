@@ -15,3 +15,7 @@ hpa:
   maxReplicas: 3
   targetCPUUtilizationPercentage: 70
 
+livenessProbe: null
+readinessProbe: null
+startupProbe: null
+

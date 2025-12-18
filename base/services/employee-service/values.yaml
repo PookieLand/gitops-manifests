@@ -62,3 +62,10 @@ readinessProbe:
   port: 80
   initialDelaySeconds: 30
   periodSeconds: 5
+
+startupProbe:
+  path: /health
+  port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 20
