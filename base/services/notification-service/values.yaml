@@ -15,9 +15,6 @@ service:
 
 env:
   APP_NAME: "Notification Service"
-  DB_HOST: "mysql"
-  DB_PORT: "3306"
-  DB_NAME: "hrms_db"
 
   JWKS_URL: "https://api.asgardeo.io/t/pookieland/oauth2/jwks"
 
@@ -31,15 +28,14 @@ env:
   DEBUG: "False"
 
   # Database Settings
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
   DB_NAME: "hrms_db"
-
   # DB_USER and DB_PASSWORD are provided via the in-cluster Secret `mysql-credentials`.
   # The Helm chart templates should be adjusted to read these values from the Secret
   # (use `valueFrom.secretKeyRef`) instead of committing plaintext here.
   # DB_USER: "user"
   # DB_PASSWORD: "password"
-  DB_HOST: "localhost"
-  DB_PORT: "3306"
   DB_CHARSET: "utf8"
 
   # CORS Settings
