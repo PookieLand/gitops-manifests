@@ -1,69 +1,69 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  name: istio-ingressgateway
-  namespace: argocd
-  labels:
-    app.kubernetes.io/name: istio-ingressgateway
-    app.kubernetes.io/part-of: istio
-spec:
-  project: hrms
-  source:
-    repoURL: https://istio-release.storage.googleapis.com/charts
-    chart: gateway
-    targetRevision: 1.22.0
-    helm:
-      releaseName: istio-ingressgateway
-      values: |
-        name: istio-ingressgateway
-        replicaCount: 2
-        service:
-          type: NodePort
-          externalTrafficPolicy: Local
-          ports:
-            - port: 80
-              targetPort: 8080
-              protocol: TCP
-              name: http2
-              nodePort: 30080
-            - port: 443
-              targetPort: 8443
-              protocol: TCP
-              name: https
-              nodePort: 30443
-            - port: 15021
-              targetPort: 15021
-              protocol: TCP
-              name: status-port
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-        autoscaling:
-          enabled: true
-          minReplicas: 2
-          maxReplicas: 5
-          targetCPUUtilizationPercentage: 80
-        podDisruptionBudget:
-          minAvailable: 1
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: istio-system
-  syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-    automated:
-      prune: true
-      selfHeal: true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   finalizers:
+#     - resources-finalizer.argocd.argoproj.io
+#   name: istio-ingressgateway
+#   namespace: argocd
+#   labels:
+#     app.kubernetes.io/name: istio-ingressgateway
+#     app.kubernetes.io/part-of: istio
+# spec:
+#   project: hrms
+#   source:
+#     repoURL: https://istio-release.storage.googleapis.com/charts
+#     chart: gateway
+#     targetRevision: 1.22.0
+#     helm:
+#       releaseName: istio-ingressgateway
+#       values: |
+#         name: istio-ingressgateway
+#         replicaCount: 2
+#         service:
+#           type: NodePort
+#           externalTrafficPolicy: Local
+#           ports:
+#             - port: 80
+#               targetPort: 8080
+#               protocol: TCP
+#               name: http2
+#               nodePort: 30080
+#             - port: 443
+#               targetPort: 8443
+#               protocol: TCP
+#               name: https
+#               nodePort: 30443
+#             - port: 15021
+#               targetPort: 15021
+#               protocol: TCP
+#               name: status-port
+#         resources:
+#           requests:
+#             cpu: 100m
+#             memory: 128Mi
+#           limits:
+#             cpu: 1000m
+#             memory: 1Gi
+#         autoscaling:
+#           enabled: true
+#           minReplicas: 2
+#           maxReplicas: 5
+#           targetCPUUtilizationPercentage: 80
+#         podDisruptionBudget:
+#           minAvailable: 1
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: istio-system
+#   syncPolicy:
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     retry:
+#       limit: 5
+#       backoff:
+#         duration: 5s
+#         factor: 2
+#         maxDuration: 3m
