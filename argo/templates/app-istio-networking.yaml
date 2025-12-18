@@ -1,32 +1,32 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  name: istio-networking
-  namespace: argocd
-  labels:
-    app.kubernetes.io/name: istio-networking
-    app.kubernetes.io/part-of: istio
-spec:
-  project: hrms
-  source:
-    repoURL: https://github.com/PookieLand/gitops-manifests.git
-    targetRevision: main
-    path: base/istio/gateway-api
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: hrms
-  syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-    automated:
-      prune: true
-      selfHeal: true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   finalizers:
+#     - resources-finalizer.argocd.argoproj.io
+#   name: istio-networking
+#   namespace: argocd
+#   labels:
+#     app.kubernetes.io/name: istio-networking
+#     app.kubernetes.io/part-of: istio
+# spec:
+#   project: hrms
+#   source:
+#     repoURL: https://github.com/PookieLand/gitops-manifests.git
+#     targetRevision: main
+#     path: base/istio/gateway-api
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: hrms
+#   syncPolicy:
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     retry:
+#       limit: 5
+#       backoff:
+#         duration: 5s
+#         factor: 2
+#         maxDuration: 3m
