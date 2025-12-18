@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  name: gateway-api-crds
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gateway-api-crds
+    app.kubernetes.io/part-of: istio
+spec:
+  project: hrms
+  source:
+    repoURL: https://github.com/PookieLand/gitops-manifests.git
+    targetRevision: main
+    path: base/gateway-api/crds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
