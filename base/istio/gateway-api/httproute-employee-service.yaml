@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: employee-service
+  namespace: hrms
+  labels:
+    app.kubernetes.io/name: employee-service
+    app.kubernetes.io/part-of: hrms
+spec:
+  parentRefs:
+    - name: hrms-gateway
+      namespace: istio-system
+  hostnames:
+    - "*"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "/api/v1/employees"
+      backendRefs:
+        - name: employee-service
+          port: 80

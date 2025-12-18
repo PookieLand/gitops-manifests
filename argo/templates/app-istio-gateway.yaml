@@ -21,15 +21,18 @@ spec:
         replicaCount: 2
         service:
           type: NodePort
+          externalTrafficPolicy: Local
           ports:
             - port: 80
               targetPort: 8080
               protocol: TCP
               name: http2
+              nodePort: 30080
             - port: 443
               targetPort: 8443
               protocol: TCP
               name: https
+              nodePort: 30443
             - port: 15021
               targetPort: 15021
               protocol: TCP
