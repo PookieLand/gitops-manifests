@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - gatewayclass-istio.yaml
   - gateway-hrms.yaml
+  - gateway-service.yaml
   - issuer.yaml
   - certificate.yaml

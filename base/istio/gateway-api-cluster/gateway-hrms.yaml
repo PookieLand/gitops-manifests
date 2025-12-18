@@ -5,11 +5,6 @@ metadata:
   namespace: istio-system
   annotations:
     networking.istio.io/service-type: NodePort
-    # Port Mappings for AWS Target Groups
-    networking.istio.io/nodePort-http: "30080"        # Prod HTTP (80)
-    networking.istio.io/nodePort-https: "30443"       # Prod HTTPS (443)
-    networking.istio.io/nodePort-staging: "30081"     # Staging HTTP (8080)
-    networking.istio.io/nodePort-staging-https: "30444" # Staging HTTPS (8443)
     networking.istio.io/external-traffic-policy: Local
 spec:
   gatewayClassName: istio
@@ -24,7 +19,10 @@ spec:
       protocol: HTTPS
       tls:
         mode: Terminate
-        certificateRefs: [{ name: hrms-tls-cert }]
+        certificateRefs:
+          - group: "" 
+            kind: Secret
+            name: hrms-tls-cert
       allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: production } } } }
 
     # --- STAGING ---
@@ -37,5 +35,8 @@ spec:
       protocol: HTTPS
       tls:
         mode: Terminate
-        certificateRefs: [{ name: hrms-tls-cert }]
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: hrms-tls-cert
       allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: staging } } } }
