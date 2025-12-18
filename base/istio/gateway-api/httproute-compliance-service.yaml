@@ -7,7 +7,9 @@ metadata:
     app.kubernetes.io/part-of: hrms
 spec:
   parentRefs:
-    - name: hrms-gateway
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: hrms-gateway
       namespace: istio-system
   rules:
     - matches:
@@ -15,5 +17,8 @@ spec:
             type: PathPrefix
             value: "/api/v1/compliance"
       backendRefs:
-        - name: compliance-service
+        - group: ""
+          kind: Service
+          name: compliance-service
           port: 80
+          weight: 1
