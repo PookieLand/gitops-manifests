@@ -10,6 +10,7 @@ on:
       - main
     paths:
       - 'base/services/**/values-staging.yaml'
+      - 'base/frontend/values-staging.yaml'
 
 jobs:
   promote:
