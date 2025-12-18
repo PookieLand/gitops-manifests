@@ -9,8 +9,6 @@ spec:
   parentRefs:
     - name: hrms-gateway
       namespace: istio-system
-  hostnames:
-    - "*"
   rules:
     - matches:
         - path:
