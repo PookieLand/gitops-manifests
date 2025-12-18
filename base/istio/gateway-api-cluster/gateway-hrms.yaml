@@ -3,33 +3,39 @@ kind: Gateway
 metadata:
   name: hrms-gateway
   namespace: istio-system
-  labels:
-    app.kubernetes.io/name: hrms-gateway
-    app.kubernetes.io/part-of: hrms
   annotations:
-    # Forces Istio to create a NodePort service
     networking.istio.io/service-type: NodePort
-    # Matches the ports defined in your Terraform Target Groups
-    networking.istio.io/nodePort-http: "30080"
-    networking.istio.io/nodePort-https: "30443"
+    # Port Mappings for AWS Target Groups
+    networking.istio.io/nodePort-http: "30080"        # Prod HTTP (80)
+    networking.istio.io/nodePort-https: "30443"       # Prod HTTPS (443)
+    networking.istio.io/nodePort-staging: "30081"     # Staging HTTP (8080)
+    networking.istio.io/nodePort-staging-https: "30444" # Staging HTTPS (8443)
     networking.istio.io/external-traffic-policy: Local
 spec:
   gatewayClassName: istio
   listeners:
+    # --- PRODUCTION ---
     - name: http
       port: 80
       protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: All
+      allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: production } } } }
     - name: https
       port: 443
       protocol: HTTPS
       tls:
         mode: Terminate
-        certificateRefs:
-          - kind: Secret
-            name: hrms-tls-cert
-      allowedRoutes:
-        namespaces:
-          from: All
+        certificateRefs: [{ name: hrms-tls-cert }]
+      allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: production } } } }
+
+    # --- STAGING ---
+    - name: staging-http
+      port: 8080
+      protocol: HTTP
+      allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: staging } } } }
+    - name: staging-https
+      port: 8443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs: [{ name: hrms-tls-cert }]
+      allowedRoutes: { namespaces: { from: Selector, selector: { matchLabels: { kubernetes.io/metadata.name: staging } } } }

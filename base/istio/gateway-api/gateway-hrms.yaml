@@ -1,35 +1,35 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: hrms-gateway
-  namespace: istio-system
-  labels:
-    app.kubernetes.io/name: hrms-gateway
-    app.kubernetes.io/part-of: hrms
-  annotations:
-    # Forces Istio to create a NodePort service
-    networking.istio.io/service-type: NodePort
-    # Matches the ports defined in your Terraform Target Groups
-    networking.istio.io/nodePort-http: "30080"
-    networking.istio.io/nodePort-https: "30443"
-    networking.istio.io/external-traffic-policy: Local
-spec:
-  gatewayClassName: istio
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: https
-      port: 443
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - kind: Secret
-            name: hrms-tls-cert
-      allowedRoutes:
-        namespaces:
-          from: All
+# apiVersion: gateway.networking.k8s.io/v1
+# kind: Gateway
+# metadata:
+#   name: hrms-gateway
+#   namespace: istio-system
+#   labels:
+#     app.kubernetes.io/name: hrms-gateway
+#     app.kubernetes.io/part-of: hrms
+#   annotations:
+#     # Forces Istio to create a NodePort service
+#     networking.istio.io/service-type: NodePort
+#     # Matches the ports defined in your Terraform Target Groups
+#     networking.istio.io/nodePort-http: "30080"
+#     networking.istio.io/nodePort-https: "30443"
+#     networking.istio.io/external-traffic-policy: Local
+# spec:
+#   gatewayClassName: istio
+#   listeners:
+#     - name: http
+#       port: 80
+#       protocol: HTTP
+#       allowedRoutes:
+#         namespaces:
+#           from: All
+#     - name: https
+#       port: 443
+#       protocol: HTTPS
+#       tls:
+#         mode: Terminate
+#         certificateRefs:
+#           - kind: Secret
+#             name: hrms-tls-cert
+#       allowedRoutes:
+#         namespaces:
+#           from: All

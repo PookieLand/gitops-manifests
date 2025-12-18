@@ -1,9 +1,9 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
-metadata:
-  name: istio
-  labels:
-    app.kubernetes.io/name: istio-gatewayclass
-    app.kubernetes.io/part-of: hrms
-spec:
-  controllerName: istio.io/gateway-controller
+# apiVersion: gateway.networking.k8s.io/v1
+# kind: GatewayClass
+# metadata:
+#   name: istio
+#   labels:
+#     app.kubernetes.io/name: istio-gatewayclass
+#     app.kubernetes.io/part-of: hrms
+# spec:
+#   controllerName: istio.io/gateway-controller
