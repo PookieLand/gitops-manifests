@@ -12,6 +12,7 @@ metadata:
     # Matches the ports defined in your Terraform Target Groups
     networking.istio.io/nodePort-http: "30080"
     networking.istio.io/nodePort-https: "30443"
+    networking.istio.io/external-traffic-policy: Local
 spec:
   gatewayClassName: istio
   listeners:
