@@ -1,8 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - gatewayclass-istio.yaml
-  - gateway-hrms.yaml
   - httproute-frontend.yaml
   - httproute-user-service.yaml
   - httproute-attendance-service.yaml
