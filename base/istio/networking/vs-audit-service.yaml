@@ -15,7 +15,7 @@ spec:
     - name: audit-route
       match:
         - uri:
-            prefix: "/api/v1/audit"
+            prefix: "/api/v1/audit-logs"
       route:
         - destination:
             host: audit-service
