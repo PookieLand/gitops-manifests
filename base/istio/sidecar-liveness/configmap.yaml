@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-proxy-liveness
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio-proxy-liveness
+    app.kubernetes.io/part-of: istio
+data:
+  liveness.sh: |
+    #!/bin/bash
+    set -e
+    if ! pidof envoy &>/dev/null; then
+      if pidof pilot-agent &>/dev/null; then
+        echo "Envoy is not running, exiting istio-proxy"
+        kill -s TERM $(pidof pilot-agent)
+        exit 1
+      fi
+    fi
+
+    if ! netstat -plunt | grep 15001; then
+      echo "Istio-proxy not listening on 15001"
+      exit 1
+    fi
+    exit 0
