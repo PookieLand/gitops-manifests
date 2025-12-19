@@ -2,7 +2,7 @@ namespace: staging
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/user-service
-  tag: "72855e70"
+  tag: "35b5f4ff"
 service:
   nodePort: 30013
 hpa:
