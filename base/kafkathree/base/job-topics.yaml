@@ -97,6 +97,9 @@ spec:
               create employee-transferred;
               create employee-salary-updated;
               create employee-salary-increment;
+              create employee-department-changed;
+              create employee-manager-changed;
+              create employee-team-changed;
               create employee-contract-started;
               create employee-contract-renewed;
               create employee-contract-ended;
@@ -106,9 +109,12 @@ spec:
               create attendance-checkin;
               create attendance-checkout;
               create attendance-updated;
+              create attendance-deleted;
               create attendance-late;
               create attendance-absent;
               create attendance-overtime;
+              create attendance-early-departure;
+              create attendance-short-leave;
               # Leave events
               create leave-requested;
               create leave-approved;
@@ -116,6 +122,12 @@ spec:
               create leave-cancelled;
               create leave-started;
               create leave-ended;
+              create leave-accrued;
+              create leave-balance-reset;
+              create leave-balance-updated;
+              create leave-extended;
+              create leave-modified;
+              create leave-revoked;
               # Compliance events
               create compliance-data-inventory-updated;
               create compliance-data-category-created;

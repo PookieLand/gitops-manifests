@@ -277,3 +277,87 @@ metadata:
   name: audit-compliance-action
 spec:
   partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: attendance-deleted
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: attendance-early-departure
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: attendance-short-leave
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: employee-department-changed
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: employee-manager-changed
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: employee-team-changed
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-accrued
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-balance-reset
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-balance-updated
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-extended
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-modified
+spec:
+  partitions: 3
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: leave-revoked
+spec:
+  partitions: 3
