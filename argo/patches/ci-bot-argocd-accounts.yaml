@@ -1,0 +1,44 @@
+---
+# Create/merge this ConfigMap into the cluster's `argocd` namespace to add
+# a `ci-bot` ArgoCD account and minimal RBAC for the `hrms-staging` project.
+#
+# Usage (as kubectl/admin):
+#   kubectl apply -f argo/patches/ci-bot-argocd-accounts.yaml -n argocd
+# Then as an ArgoCD admin run:
+#   argocd account generate-token --account ci-bot
+# and copy the token into the GitHub Actions secret `ARGOCD_TOKEN`.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  # grant the ci-bot account the ability to use API tokens and login
+  accounts.ci-bot: apiKey,login
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  # RBAC policies: create a role 'role:ci-bot' with restricted application access
+  policy.csv: |
+    # allow the role to view application status in the hrms-staging project
+    p, role:ci-bot, applications, get, hrms-staging/*, allow
+    p, role:ci-bot, applications, list, hrms-staging/*, allow
+    p, role:ci-bot, applications, watch, hrms-staging/*, allow
+
+    # (optional) allow fetching resource details for debugging
+    p, role:ci-bot, applications, resource, hrms-staging/*, allow
+
+    # bind the ci-bot account to the role
+    g, ci-bot, role:ci-bot
+
+  # Optional: a short explanation for maintainers
+  # Note: if you already manage these ConfigMaps in cluster, merge these
+  # entries rather than overwriting the entire ConfigMap. Applying this
+  # manifest will replace the ConfigMap when using `kubectl apply` unless
+  # you merge the data fields with the existing one.
