@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
-  tag: 0ef974c5
+  tag: b8b5caad
 namespace: staging
 service:
   nodePort: 30006
