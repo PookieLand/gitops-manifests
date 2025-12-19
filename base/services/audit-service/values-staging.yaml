@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/audit-service
-  tag: 7e589b04
+  tag: 05ac8d9c
 namespace: staging
 service:
   nodePort: 30014
