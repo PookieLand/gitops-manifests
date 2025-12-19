@@ -1,14 +1,12 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/compliance-service
-  tag: ed9dd073
+  tag: b8b5caad
 namespace: production
 service:
   nodePort: 30008
 envSecret:
   name: mysql-production
-
-
 hpa:
   enabled: true
   name: compliance-service-hpa
