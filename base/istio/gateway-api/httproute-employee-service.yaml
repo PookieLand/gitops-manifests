@@ -22,12 +22,16 @@ spec:
         - path:
             type: PathPrefix
             value: "/api/v1/teams"
-        - path: 
-            type: PathPrefix
-            value: "/api/v1/reports"
+        - path:
+             type: PathPrefix
+             value: "/api/v1/reports"
         - path:
              type: PathPrefix
              value: "/api/v1/dashboard"
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            uri: "/$1/"   # or the proper pattern for trailing slash
       backendRefs:
         - group: ""
           kind: Service
