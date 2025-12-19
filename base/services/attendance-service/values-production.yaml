@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/attendance-service
-  tag: bef21858
+  tag: fa14496c
 namespace: production
 service:
   nodePort: 30019
@@ -15,4 +15,3 @@ hpa:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 70
-
