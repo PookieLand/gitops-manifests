@@ -47,3 +47,7 @@ env:
   NOTIFICATION_SERVICE_URL: "http://notification-service:80"
   COMPLIANCE_SERVICE_URL: "http://compliance-service:80"
 
+strategy:
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
