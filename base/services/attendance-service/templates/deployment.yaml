@@ -22,7 +22,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
         ports:
-        - containerPort: 80
+        - containerPort: 8000
         env:
           {{- range $key, $value := .Values.env }}
           {{- if ne $key "CORS_ORIGINS" }}
