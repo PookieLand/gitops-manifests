@@ -2,6 +2,6 @@ namespace: staging
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/frontend
-  tag: d8811ca8
+  tag: 04926aa5
 service:
   nodePort: 30030
