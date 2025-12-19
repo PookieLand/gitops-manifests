@@ -90,7 +90,13 @@ jobs:
       - name: Update production values
         if: steps.detect.outputs.service != ''
         run: |
-          PROD_VALUES="base/services/$SERVICE_NAME/values-production.yaml"
+          # Determine production values path: services vs frontend
+          if echo "$FILE_PATH" | grep -q "^base/frontend/"; then
+            PROD_VALUES="base/frontend/values-production.yaml"
+          else
+            PROD_VALUES="base/services/$SERVICE_NAME/values-production.yaml"
+          fi
+
           if [ ! -f "$PROD_VALUES" ]; then
             echo "$PROD_VALUES does not exist, skipping."
             exit 0
@@ -108,6 +114,7 @@ jobs:
           git add "$PROD_VALUES"
           git commit -m "Promote $SERVICE_NAME image to production: $IMAGE_TAG" || echo "No changes to commit"
         env:
+          FILE_PATH: ${{ steps.detect.outputs.file }}
           IMAGE_TAG: ${{ steps.detect.outputs.image }}
           SERVICE_NAME: ${{ steps.detect.outputs.service }}
           GIT_AUTHOR_NAME: ${{ env.GIT_AUTHOR_NAME }}
