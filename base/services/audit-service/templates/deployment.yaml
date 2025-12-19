@@ -9,6 +9,11 @@ spec:
     matchLabels:
       app: {{ include "audit-service.fullname" . }}
       tier: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge | default 1 }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable | default 0 }}
   template:
     metadata:
       labels:
