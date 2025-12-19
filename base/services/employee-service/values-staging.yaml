@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/employee-service
-  tag: de03d730
+  tag: a11cd4e2
 namespace: staging
 service:
   nodePort: 30016
