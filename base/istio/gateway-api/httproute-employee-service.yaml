@@ -14,6 +14,91 @@ spec:
   rules:
     - matches:
         - path:
+            type: Exact
+            value: "/api/v1/employees"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: "/api/v1/employees/"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: employee-service
+          port: 80
+          weight: 1
+
+    - matches:
+        - path:
+            type: Exact
+            value: "/api/v1/hierarchy"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: "/api/v1/hierarchy/"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: employee-service
+          port: 80
+          weight: 1
+
+    - matches:
+        - path:
+            type: Exact
+            value: "/api/v1/teams"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: "/api/v1/teams/"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: employee-service
+          port: 80
+          weight: 1
+
+    - matches:
+        - path:
+            type: Exact
+            value: "/api/v1/reports"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: "/api/v1/reports/"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: employee-service
+          port: 80
+          weight: 1
+
+    - matches:
+        - path:
+            type: Exact
+            value: "/api/v1/dashboard"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: "/api/v1/dashboard/"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: employee-service
+          port: 80
+          weight: 1
+
+    - matches:
+        - path:
             type: PathPrefix
             value: "/api/v1/employees"
         - path:
@@ -22,16 +107,12 @@ spec:
         - path:
             type: PathPrefix
             value: "/api/v1/teams"
-        - path:
-             type: PathPrefix
-             value: "/api/v1/reports"
+        - path: 
+            type: PathPrefix
+            value: "/api/v1/reports"
         - path:
              type: PathPrefix
              value: "/api/v1/dashboard"
-      filters:
-        - type: RequestRedirect
-          requestRedirect:
-            uri: "/$1/"   # or the proper pattern for trailing slash
       backendRefs:
         - group: ""
           kind: Service
