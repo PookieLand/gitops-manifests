@@ -2,7 +2,7 @@ namespace: production
 replicaCount: 1
 image:
   repository: 475936984863.dkr.ecr.ap-south-1.amazonaws.com/hrms/leave-service
-  tag: "47952936"
+  tag: "dc3a106e"
 service:
   nodePort: 30018
 mysqlSecretName: "mysql-production"
@@ -14,4 +14,3 @@ hpa:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 70
-
